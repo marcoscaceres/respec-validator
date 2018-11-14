@@ -49,7 +49,8 @@ const optionList = [
     type: String,
   },
   {
-    description: "A GitHub user associated with the token. Must also pass --gh-user.",
+    description:
+      "A GitHub user associated with the token. Must also pass --gh-user.",
     name: "gh-user",
     type: String,
   },
@@ -183,6 +184,7 @@ async function checkLinks(file) {
  * If there are any errors or warnings, the app exits with 1.
  */
 async function validate(options) {
+  if (DEBUG) console.log("Version:", await getPackageVersion());
   let exitCode = 0;
   try {
     const params = {};
@@ -212,6 +214,16 @@ async function validate(options) {
   }
 }
 
+async function getPackageVersion() {
+  const fs = require("fs");
+  const { promisify } = require("util");
+  const readFileAsync = promisify(fs.readFile);
+  const packagePath = path.resolve(__dirname, "./package.json");
+  const content = await readFileAsync(packagePath, "utf-8");
+  const { version } = JSON.parse(content);
+  return version;
+}
+
 async function parseCommandLine() {
   let options;
   try {
@@ -222,12 +234,7 @@ async function parseCommandLine() {
   }
   DEBUG = options.debug;
   if (options.version) {
-    const fs = require("fs");
-    const { promisify } = require("util");
-    const readFileAsync = promisify(fs.readFile);
-    const packagePath = path.resolve(__dirname, "./package.json");
-    const content = await readFileAsync(packagePath, "utf-8");
-    const { version } = JSON.parse(content);
+    const version = await getPackageVersion();
     console.info(version + "\n");
     return process.exit(0);
   }
