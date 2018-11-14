@@ -1,12 +1,22 @@
 # respec-validator
 A tool that helps validates a ReSpec document for publication.
 
+## Installation
+
+```Bash
+npm install respec-validator
+```
+
 ## Options
+
+Usage: `npx respec-validator [options] [respec-file]`
+
+The following `options` are available:
 
   * `-l`, `--no-links`        Don't validate cross references.
   * `-v`, `--no-validator`    Don't perform HTML validation.
   * `-h`, `--help`            Display this usage guide.
-  * `--status` string       Override the spec's status.
+  * `--status` string       Override the spec's [status](https://github.com/w3c/respec/wiki/specStatus) (e.g., "ED").
   * `--gh-token` string     A GitHub token, if needed: https://github.com/settings/tokens
   * `--src` string          Optional, a ReSpec src file (default to index.html).
 
