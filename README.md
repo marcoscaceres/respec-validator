@@ -19,10 +19,11 @@ The following `options` are available:
   * `--status` string       Override the spec's [status](https://github.com/w3c/respec/wiki/specStatus) (e.g., "ED").
   * `--gh-token` string     A GitHub token, if needed: https://github.com/settings/tokens
   * `--src` string          Optional, a ReSpec src file (default to index.html).
+  * `--debug`               Shows addition debugging information.
 
 ## Examples
 
-Check all warnings/errors, HTML, and cross references.   
+Check all warnings/errors, HTML, and cross references.
 
 ```Bash
 $ npx respec-validate index.html

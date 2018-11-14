@@ -26,6 +26,12 @@ const optionList = [
     type: Boolean,
   },
   {
+    defaultValue: false,
+    description: "Show additional debugging information.",
+    name: "debug",
+    type: Boolean,
+  },
+  {
     description: "Override the spec's status.",
     name: "status",
     type: String,
@@ -180,6 +186,7 @@ async function validate(options) {
     }
     console.info("🎉 All checks passed!");
   } catch (err) {
+    if (options.debug) console.error(err);
     console.info("\n ❌  Not so good... please fix the issues above.");
     exitCode = 1;
   } finally {
