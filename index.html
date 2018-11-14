@@ -1,0 +1,4091 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>
+      Web App Manifest
+    </title>
+    <script src="https://www.w3.org/Tools/respec/respec-w3c-common" class=
+    "remove"></script>
+    <script class='remove'>
+    var respecConfig = {
+      previousPublishDate: "2013-12-17",
+      specStatus: 'ED',
+      shortName: 'appmanifest',
+      subtitle: 'Living Document',
+      prevVersion: 'FPWD',
+      previousMaturity: "WD",
+      editors: [{
+        name: "Marcos Caceres",
+        company: "Mozilla Corporation",
+        companyURL: "https://mozilla.org/",
+        w3cid: 39125
+      }, {
+        name: "Kenneth Rohde Christiansen",
+        company: "Intel Corporation",
+        companyURL: "https://intel.com/",
+        w3cid: 57705
+      }, {
+        name: "Mounir Lamouri",
+        company: "Google Inc.",
+        companyURL: "https://google.com/",
+        w3cid: 45389
+      }, {
+        name: "Anssi Kostiainen",
+        company: "Intel Corporation",
+        companyURL: "https://intel.com/",
+        w3cid: 41974
+      }, {
+        name: "Rob Dolin",
+        company: "Microsoft Corporation",
+        companyURL: "https://microsoft.com/",
+        w3cid: 60712
+      }, {
+        name: "Matt Giuca",
+        company: "Google Inc.",
+        companyURL: "https://google.com/",
+        w3cid: 91260
+      }],
+      wg: 'Web Platform Working Group',
+      wgURI: 'https://www.w3.org/WebPlatform/WG/',
+      wgPublicList: 'public-webapps',
+      wgPatentURI: 'https://www.w3.org/2004/01/pp-impl/83482/status',
+      otherLinks: [{
+        key: "Implementation status",
+        data: [{
+          value: "Blink",
+          href: "https://www.chromestatus.com/feature/6488656873259008"
+        }, {
+          value: "EdgeHTML",
+          href: "https://developer.microsoft.com/en-us/microsoft-edge/platform/status/webapplicationmanifest/"
+        }, {
+          value: "Gecko",
+          href: "https://bugzil.la/997779"
+        }, {
+          value: "WebKit",
+          href: "https://webkit.org/b/158205"
+        }]
+      }],
+      github: "https://github.com/w3c/manifest/",
+      pluralize: true,
+      caniuse: {
+          feature: "web-app-manifest",
+          browsers: ["chrome", "firefox", "safari", "edge", "and_chr", "and_ff", "ios_saf"],
+      },
+    };
+    </script>
+    <style>
+      .icon-title {
+        text-transform: uppercase;
+        font-weight: bold;
+      }
+
+      .icons {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .icons > div {
+        text-align: left;
+        padding: 10px;
+        width: 188px;
+      }
+
+      .icons > div > img {
+        width: 188px;
+        height: 188px;
+        min-width: 188px;
+        min-height: 188px;
+      }
+    </style>
+  </head>
+  <body>
+    <section id='abstract'>
+      <p>
+        This specification defines a JSON-based manifest file that provides
+        developers with a centralized place to put metadata associated with a
+        web application. This metadata includes, but is not limited to, the web
+        application's name, links to icons, as well as the preferred URL to
+        open when a user launches the web application. The manifest also allows
+        developers to declare a default orientation for their web application,
+        as well as providing the ability to set the display mode for the
+        application (e.g., in fullscreen). Additionally, the manifest allows a
+        developer to "scope" a web application to a URL. This restricts the
+        URLs to which the manifest is applied and provides a means to "deep
+        link" into a web application from other applications.
+      </p>
+      <p>
+        Using this metadata, user agents can provide developers with means to
+        create user experiences that are more comparable to that of a native
+        application.
+      </p>
+      <p>
+        This specification also defines the <code>manifest</code> link type as
+        a declarative means to associate a document with a manifest.
+      </p>
+    </section>
+    <section id="sotd">
+      <div class="warning">
+        <p>
+          Implementors need to be aware that this specification is not stable.
+          However, aspects of this specification are shipping in at least one
+          browser (see links to implementation status at the top of this
+          document). <strong>Implementors who are not taking part in the
+          discussions will find the specification changing out from under them
+          in incompatible ways.</strong> Vendors interested in implementing
+          this specification before it eventually reaches the Candidate
+          Recommendation phase should <a href=
+          "https://github.com/w3c/manifest/issues">subscribe to the repository
+          on GitHub</a> and take part in the discussions.
+        </p>
+      </div>
+    </section>
+    <section class="informative">
+      <h2>
+        Usage Examples
+      </h2>
+      <p>
+        This section shows how developers can make use of the various features
+        of this specification.
+      </p>
+      <section class="informative">
+        <h3>
+          Example manifests
+        </h3>
+        <p>
+          The following shows a very simple <a>manifest</a>.
+        </p>
+        <pre class="example json" title="very simple manifest">
+        {
+          "name": "Donate App",
+          "description": "This app helps you donate to worthy causes.",
+          "icons": [{
+            "src": "images/icon.png",
+            "sizes": "192x192"
+          }]
+        }
+        </pre>
+        <p>
+          The following shows a more typical <a>manifest</a>.
+        </p>
+        <pre class="example json" title="typical manifest">
+          {
+            "lang": "en",
+            "dir": "ltr",
+            "name": "Super Racer 3000",
+            "description": "The ultimate futuristic racing game from the future!",
+            "short_name": "Racer3K",
+            "icons": [{
+              "src": "icon/lowres.webp",
+              "sizes": "64x64",
+              "type": "image/webp"
+            },{
+              "src": "icon/lowres.png",
+              "sizes": "64x64"
+            }, {
+              "src": "icon/hd_hi",
+              "sizes": "128x128"
+            }],
+            "scope": "/racer/",
+            "start_url": "/racer/start.html",
+            "display": "fullscreen",
+            "orientation": "landscape",
+            "theme_color": "aliceblue",
+            "background_color": "red",
+            "serviceworker": {
+              "src": "sw.js",
+              "scope": "/racer/",
+              "update_via_cache": "none"
+            },
+            "screenshots": [{
+              "src": "screenshots/in-game-1x.jpg",
+              "sizes": "640x480",
+              "type": "image/jpeg"
+            },{
+              "src": "screenshots/in-game-2x.jpg",
+              "sizes": "1280x920",
+              "type": "image/jpeg"
+            }]
+          }
+      </pre>
+      </section>
+      <section class="informative">
+        <h3>
+          Using a <code>link</code> element to link to a manifest
+        </h3>
+        <p>
+          Example of using a <code>link</code> element to associate a website
+          with a <a>manifest</a>. The example also shows how to use [[HTML]]'s
+          <code>link</code> and <code>meta</code> elements to give the web
+          application a fallback name and set of icons.
+        </p>
+        <pre class="example html" title="linking to a manifest">
+          &lt;!doctype&gt;
+          &lt;html&gt;
+          &lt;title&gt;Racer 3K&lt;/title&gt;
+
+          &lt;!-- Startup configuration --&gt;
+          &lt;link rel="manifest" href="manifest.webmanifest"&gt;
+
+          &lt;!-- Fallback application metadata for legacy browsers --&gt;
+          &lt;meta name="application-name" content="Racer3K"&gt;
+          &lt;link rel="icon" sizes="16x16 32x32 48x48" href="lo_def.ico"&gt;
+          &lt;link rel="icon" sizes="512x512" href="hi_def.png"&gt;
+        </pre>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Installable web applications
+      </h2>
+      <p>
+        A common use case of a manifest is for a user agent to <dfn data-lt=
+        "installing|installed|installation" data-export="">install</dfn> a web
+        application; whereby the user agent provides the end-user with a means
+        of instantiating a new <a>top-level browsing context</a> that has the
+        manifest's members <a>applied</a> to it. That is, the manifest's
+        members, or their defaults, are in effect on the <a>top-level browsing
+        context</a>. This distinguishes an installed web application from a
+        traditional bookmark, as opening a web page from a traditional bookmark
+        will not have the manifest's properties <a>applied</a> to it.
+      </p>
+      <p>
+        For example, on user agents that support installation, a web
+        application could be presented and launched in a way that, to the
+        end-user, is indistinguishable from native applications: such as
+        appearing as a labeled icon on the home screen, launcher, or start
+        menu. When launched, the manifest is <a>applied</a> by the user agent
+        to the <a>top-level browsing context</a> prior to the <a>start URL</a>
+        being loaded. This gives the user agent an opportunity to apply the
+        relevant values of the manifest, possibly changing the <a>display
+        mode</a> and screen orientation of the web application. Alternatively,
+        and again as an example, the user agent could <a>install</a> the web
+        application into a list of bookmarks within the user agent itself.
+      </p>
+      <section data-dfn-for="AppBannerPromptOutcome">
+        <h4>
+          <code>AppBannerPromptOutcome</code> enum
+        </h4>
+        <pre class="idl">
+          enum AppBannerPromptOutcome {
+            "accepted",
+            "dismissed"
+          };
+        </pre>
+        <p>
+          The <dfn>AppBannerPromptOutcome</dfn> enum's values represent the
+          outcomes from <a data-lt="presents an install prompt">presenting the
+          end-user with an install prompt</a>.
+        </p>
+        <dl data-dfn-for="AppBannerPromptOutcome">
+          <dt>
+            <dfn>accepted</dfn>:
+          </dt>
+          <dd>
+            The end-user indicated that they would like the user agent to
+            <a>install</a> the web application.
+          </dd>
+          <dt>
+            <dfn>dismissed</dfn>:
+          </dt>
+          <dd>
+            The end-user dismissed the install prompt.
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h3>
+          Authority of the manifest's metadata
+        </h3>
+        <p>
+          When a <a>manifest</a> is linked from a <code>Document</code>, it
+          indicates to the user agent that the metadata is
+          <dfn>authoritative</dfn>: that is, the user agent SHOULD use the
+          metadata of the manifest instead of the one in the
+          <code>Document</code>. However, in cases where metadata is missing,
+          or in error, a user agent MAY fallback to the <code>Document</code>
+          to find suitable replacements for missing manifest members (e.g.,
+          using <code>application-name</code> in place of
+          <code>short_name</code>).
+        </p>
+      </section>
+      <section data-link-for="WebAppManifest">
+        <h3>
+          Application's name
+        </h3>
+        <p>
+          The <dfn>application's name</dfn> is derived from either the
+          <a>name</a> member or <a>short_name</a> member (if either is present)
+          - otherwise, it is generated by the user agent or provided by the
+          end-user.
+        </p>
+        <p>
+          When either member is missing from the manifest, a user agent MAY use
+          the <a>name</a> member as a fallback for the <a>short_name</a> member
+          or vice versa.
+        </p>
+        <p>
+          If the <a>name</a> and <a>short_name</a> members are undefined, the
+          user agent SHOULD assign a default name (e.g., "Untitled").
+          Alternatively, a user agent MAY allow the end-user to input some text
+          that can serve as the <a>application's name</a>.
+        </p>
+        <p>
+          When both the <a>name</a> and <a>short_name</a> members are present,
+          it is left up to implementations to decide which member is best
+          suited for the space available (e.g., the <a>short_name</a> member
+          might be better suited for the space available underneath an icon).
+        </p>
+      </section>
+      <section>
+        <h3>
+          Installation process
+        </h3>
+        <p>
+          An <dfn>installation process</dfn> is an attempt by the user agent to
+          <a>install</a> a web application. The details of such a process
+          (i.e., the display of an install <abbr>UI</abbr>, and any resulting
+          <abbr>IO</abbr> operations of the host <abbr>OS</abbr>) are left up
+          to implementers. Implementers need to be aware that there are
+          <a href="#installation-sec">privacy and security considerations</a>
+          that directly relate to the <a>installation process</a>.
+        </p>
+        <p>
+          For the purpose of this specification, the <dfn>installation
+          succeeded</dfn> once the <a>installation process</a> succeeds in
+          <a>installing</a> the web application (e.g., an icon was successfully
+          placed onto the device's homescreen). If the end-user cancels the
+          installation process (even if they <a>manually</a> triggered it, and
+          then changed their minds), then the <dfn>installation was
+          canceled</dfn>. Otherwise, the <dfn>installation failed</dfn>.
+          Reasons for installation failure can include, for example, the OS
+          denying permission to the user agent to add an icon to the homescreen
+          of the device and the end-user rejecting the installation.
+        </p>
+        <p>
+          The <dfn>steps to install the web application</dfn> are given by the
+          following algorithm:
+        </p>
+        <ol>
+          <li>Let <var>window</var> be the <code>Window</code> object of the
+          <a>top-level browsing context</a> for which the user agent will
+          attempt installation.
+          </li>
+          <li>Then, <a>in parallel</a>:
+            <ol>
+              <li>Instantiate an <a>installation process</a>.
+              </li>
+              <li>Let <a>manifest</a> and <a>manifest URL</a> be the result of
+              <a>obtaining the manifest</a>.
+              </li>
+              <li>If <a>obtaining the manifest</a> results in an error, a user
+              agent can, at this point, fall back to using the <a>top-level
+              browsing context</a> <code>Document</code>'s metadata to populate
+              an <a>installation process</a>'s UI.
+              </li>
+              <li>If <a>obtaining the manifest</a> succeeds, and the result of
+              running <a>processing the serviceworker member</a> with
+              <a>manifest</a> returns a valid <var>registration</var>, a user
+              agent can at this point
+                <ol>
+                  <li>Let <var>client</var> be the <a>top-level browsing
+                  context</a> <code>Document</code>'s <a href=
+                  "https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">
+                    relevant settings object</a>, or <code>null</code> if
+                    unavailable.
+                  </li>
+                  <li>Invoke <a>Start Register</a> with <var>scope</var> and
+                  <var>src</var> members of the <var>registration</var>, a new
+                  <var>promise</var>, <var>client</var>, <a>manifest URL</a>,
+                  plus the <var>type</var> and <var>update_via_cache</var>
+                  members of the <var>registration</var>,
+                  </li>
+                </ol>in which case the state of the settled <var>promise</var>
+                determines whether the <a>installation succeeded</a> or not.
+              </li>
+              <li>If the <a>installation succeeded</a>, <a>queue a task</a> on
+              the <a>application life-cycle task source</a> to <a>fire an
+              event</a> named <code>appinstalled</code> at the
+              <var>window</var> object.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h2>
+          Install prompts
+        </h2>
+        <p>
+          There are multiple ways that the installation process can be
+          triggered:
+        </p>
+        <ul>
+          <li>An end-user can <dfn data-lt="manual installation">manually</dfn>
+          trigger the <a>installation process</a> through the user agent's
+          <abbr>UI</abbr>.
+          </li>
+          <li>The <a>installation process</a> can occur through an
+          <dfn>automated install prompt</dfn>: that is, a <abbr>UI</abbr> that
+          the user agent presents to the user when, for instance, there are
+          sufficient <a>installability signals</a> to warrant
+          <a>installation</a> of the web application.
+          </li>
+          <li>The <a>installation process</a> can occur through a
+          <dfn>site-triggered install prompt</dfn>: the site can
+          programmatically request that the user agent present an install
+          prompt to the user. The user agent MAY restrict the availability of
+          this feature to cases where, for instance, there are sufficient
+          <a>installability signals</a> to warrant <a>installation</a> of the
+          web application.
+          </li>
+        </ul>
+        <p>
+          Prior to presenting an <a>automated install prompt</a>, a user agent
+          MUST run the <a>steps to notify that an install prompt is
+          available</a>, to give the site the opportunity to prevent the
+          default action (which is to install the application). Alternatively,
+          the user agent MAY run the <a>steps to notify that an install prompt
+          is available</a> at any time, giving the site the opportunity to show
+          a <a>site-triggered install prompt</a> without automatically showing
+          the prompt.
+        </p>
+        <p>
+          In either case, when a user agent <dfn data-lt=
+          "present an install prompt|presenting an install prompt">presents an
+          install prompt</dfn>, the end-user's choice is represented either
+          "accepted" or "dismissed". These values are represented in the API of
+          this specification via the <a>AppBannerPromptOutcome</a> enum.
+        </p>
+        <p>
+          The <dfn>steps to notify that an install prompt is available</dfn>
+          are given by the following algorithm:
+        </p>
+        <ol>
+          <li>Wait until the <code>Document</code> of the <a>top-level browsing
+          context</a> is <a>completely loaded</a>.
+          </li>
+          <li>If there is already an <a>installation process</a> being
+          <a data-lt="present an install prompt">presented</a>, terminate this
+          algorithm.
+          </li>
+          <li>
+            <a>Queue a task</a> on the <a>application life-cycle task
+            source</a> to do the following:
+            <ol>
+              <li>Let <var>event</var> be a newly constructed
+              <a>BeforeInstallPromptEvent</a> named
+              <code>beforeinstallprompt</code>, with its
+              <code>cancelable</code> attribute initialized to true.
+              </li>
+              <li>Let <var>mayShowPrompt</var> be the result of <a>firing</a>
+              <var>event</var> at the <a>Window</a> object of the <a>top-level
+              browsing context</a>.
+              </li>
+              <li>If <var>mayShowPrompt</var> is true, then the user agent MAY,
+              <a>in parallel</a>, <a>request to present an install prompt</a>
+              with <var>event</var>.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3 id="installation-sec">
+          Privacy and security considerations
+        </h3>
+        <p>
+          During the <a>installation process</a>, it is RECOMMENDED that the
+          user agent allow the end-user to inspect the icon, name, <a>start
+          URL</a>, origin, etc. pertaining to a web application. This is to
+          give an end-user an opportunity to make a conscious decision to
+          approve, and possibly modify, the information pertaining to the web
+          application before installing it. This also gives the end-user an
+          opportunity to discern if the web application is spoofing another web
+          application, by, for example, using an unexpected icon or name.
+        </p>
+        <p>
+          It is RECOMMENDED that user agents prevent other applications from
+          determining which applications are installed on the system (e.g., via
+          a timing attack on the user agent's cache). This could be done by,
+          for example, invalidating from the user agent's cache the resources
+          linked to from the manifest (for example, icons) after a web
+          application is <a>installed</a> - or by using an entirely different
+          cache from that used for regular web browsing.
+        </p>
+      </section>
+      <section class="informative">
+        <h3>
+          Installability signals
+        </h3>
+        <p>
+          By design, this specification does not provide developers with an
+          explicit API to "install" a web application. Instead, a
+          <a>manifest</a> can serve as an <dfn>installability signal</dfn> to a
+          user agent that a web application can be <a>installed</a>.
+        </p>
+        <p>
+          Examples of <a>installability signals</a> for a web application:
+        </p>
+        <ul>
+          <li>is <a>associated with a manifest</a> with at least a
+          <code>name</code> member and a suitable icon.
+          </li>
+          <li>is served over a secure network connection.
+          </li>
+          <li>has a sensible content security policy.
+          </li>
+          <li>is able to responsively adapt to display on a variety of screen
+          sizes, catering for both mobile and desktop.
+          </li>
+          <li>is able to function without a network connection.
+          </li>
+          <li>is repeatedly used by the end-user over some extended period of
+          time.
+          </li>
+          <li>has been explicitly marked by the user as one that they value and
+          trust (e.g., by bookmarking or "starring" it).
+          </li>
+        </ul>
+        <p>
+          This list is not exhaustive and some <a>installability signals</a>
+          might not apply to all user agents. How a user agent makes use of
+          these <a>installability signals</a> to determine if a web application
+          can be <a>installed</a> is left to implementers.
+        </p>
+      </section>
+      <section>
+        <h3>
+          Uninstallation
+        </h3>
+        <p>
+          User agents SHOULD provide a mechanism for the user to remove the
+          installed application.
+        </p>
+        <p>
+          It is RECOMMENDED that at the time of removal, the user agent also
+          present the user with an opportunity to revoke other persistent data
+          and settings associated with the application, such as permissions and
+          persistent storage.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Installation Events
+      </h2>
+      <p>
+        DOM events <a>fired</a> by this specification use the <dfn>application
+        life-cycle task source</dfn>.
+      </p>
+      <section data-dfn-for="BeforeInstallPromptEvent" data-link-for=
+      "BeforeInstallPromptEvent">
+        <h3>
+          <dfn>BeforeInstallPromptEvent</dfn> Interface
+        </h3>
+        <div class="note">
+          The <a>beforeinstallprompt</a> event is somewhat misnamed, as it does
+          not necessarily signal that an <a>automated install prompt</a> will
+          follow (depending on the user agent, it might just be giving the site
+          the ability to trigger an install prompt). It is so named for
+          historical reasons.
+        </div>
+        <pre class="idl">
+          [Constructor(DOMString type, optional EventInit eventInitDict),
+           Exposed=Window]
+          interface BeforeInstallPromptEvent : Event {
+              Promise&lt;PromptResponseObject&gt; prompt();
+          };
+          dictionary PromptResponseObject {
+            AppBannerPromptOutcome userChoice;
+          };
+        </pre>
+        <p>
+          The <a>BeforeInstallPromptEvent</a> is dispatched when the site is
+          allowed to present a <a>site-triggered install prompt</a>, or prior
+          to the user agent presenting an <a>automated install prompt</a>. It
+          allows the site to cancel the <a>automated install prompt</a>, as
+          well as manually present the <a>site-triggered install prompt</a>.
+        </p>
+        <div class="note">
+          If the <a>BeforeInstallPromptEvent</a> is <em>not</em> cancelled, the
+          user agent is allowed to <a data-lt=
+          "presents an install prompt">present an automated install prompt</a>
+          to the end-user. Canceling the default action (via <a data-cite=
+          "DOM#dom-event-preventdefault">preventDefault</a>) prevents the user
+          agent from <a data-lt="presents an install prompt">presenting an
+          automated install prompt</a>. The user agent is free to run <a>steps
+          to notify that an install prompt is available</a> again at a later
+          time.
+        </div>
+        <p data-dfn-for="PromptResponseObject">
+          The <dfn>PromptResponseObject</dfn> contains the result of calling
+          <a data-lt="BeforeInstallPromptEvent.prompt()">prompt()</a>. It
+          contains one member, <dfn data-link-for=
+          "PromptResponseObject">userChoice</dfn>, which states the user's
+          chosen outcome.
+        </p>
+        <p>
+          An instance of a <a>BeforeInstallPromptEvent</a> has the following
+          internal slots:
+        </p>
+        <dl>
+          <dt>
+            <dfn>[[\didPrompt]]</dfn>
+          </dt>
+          <dd>
+            A boolean, initially <code>false</code>. Represents whether this
+            event was used to <a>present an install prompt</a> to the end-user.
+          </dd>
+          <dt>
+            <dfn>[[\userResponsePromise]]</dfn>
+          </dt>
+          <dd>
+            A promise that represents the outcome of <a>presenting an install
+            prompt</a>.
+          </dd>
+        </dl>
+        <section>
+          <h4>
+            <code>prompt()</code> method
+          </h4>
+          <p>
+            The <dfn>prompt</dfn> method, when called, runs the following
+            steps:
+          </p>
+          <ol>
+            <li>If <var>this</var>.<a>[[\userResponsePromise]]</a> is pending:
+              <ol>
+                <li>If this event's <a data-cite=
+                "!DOM#dom-event-istrusted"><code>isTrusted</code></a> attribute
+                is <code>false</code>, reject
+                <var>this</var>.<a>[[\userResponsePromise]]</a> with
+                <a>NotAllowedError</a>, optionally informing the developer that
+                untrusted events can't call <code>prompt()</code>.
+                </li>
+                <li>Else if <var>this</var>.<a>[[\didPrompt]]</a> is
+                <code>false</code>, set <var>this</var>.<a>[[\didPrompt]]</a>
+                to <code>true</code>, then <a>in parallel</a>, <a>request to
+                present an install prompt</a> with this event. Wait, possibly
+                indefinitely, for the end-user to make a choice.
+                </li>
+              </ol>
+            </li>
+            <li>Return <var>this</var>.<a>[[\userResponsePromise]]</a>.
+            </li>
+          </ol>
+          <p>
+            To <dfn>request to present an install prompt</dfn> with
+            <a>BeforeInstallPromptEvent</a> <var>event</var>:
+          </p>
+          <ol>
+            <li>
+              <a>Present an install prompt</a> and let <var>outcome</var> be
+              the result.
+            </li>
+            <li>Resolve <var>event</var>.<a>[[\userResponsePromise]]</a> with a
+            newly created <a>PromptResponseObject</a> whose <a data-link-for=
+            "PromptResponseObject">userChoice</a> member is the value of <var>
+              outcome</var>.
+            </li>
+          </ol>
+        </section>
+        <section class="informative">
+          <h4>
+            Usage example
+          </h4>
+          <p>
+            This example shows how one might prevent an automated install
+            prompt from showing until the user clicks a button to show a
+            <a>site-triggered install prompt</a>. In this way, the site can
+            leave installation at the user's discretion (rather than prompting
+            at an arbitrary time), whilst still providing a prominent UI to do
+            so.
+          </p>
+          <pre class="example" title=
+          "Using beforeinstallprompt to present an install button">
+            window.addEventListener("beforeinstallprompt", event =&gt; {
+              // Suppress automatic prompting.
+              event.preventDefault();
+
+              // Show the (disabled-by-default) install button. This button
+              // resolves the installButtonClicked promise when clicked.
+              installButton.disabled = false;
+
+              // Wait for the user to click the button.
+              installButton.addEventListener("click", async e =&gt; {
+                // The prompt() method can only be used once.
+                installButton.disabled = true;
+
+                // Show the prompt.
+                const { userChoice } = await event.prompt();
+                console.info(`user choice was: ${userChoice}`);
+              });
+            });
+          </pre>
+        </section>
+      </section>
+      <section>
+        <h3>
+          Extensions to the <code>Window</code> object
+        </h3>
+        <p>
+          The following extensions to the <code><dfn data-cite=
+          "HTML/window-object.html#window">Window</dfn></code> object specify
+          the <a>event handler attributes</a> on which events relating to the
+          <a>installation</a> of a web application are <a>fired</a>.
+        </p>
+        <pre class="idl">
+          partial interface Window {
+            attribute EventHandler onappinstalled;
+            attribute EventHandler onbeforeinstallprompt;
+          };
+        </pre>
+        <div class="example">
+          <p>
+            This example shows two ways of handling the "<a>appinstalled</a>"
+            event.
+          </p>
+          <pre class="example js">
+            function handleInstalled(ev) {
+              const date = new Date(ev.timeStamp / 1000);
+              console.log(`Yay! Our app got installed at ${date.toTimeString()}.`);
+            }
+
+            // Using the event handler IDL attribute
+            window.onappinstalled = handleInstalled;
+
+            // Using .addEventListener()
+            window.addEventListener("appinstalled", handleInstalled);
+          </pre>
+        </div>
+        <section data-dfn-for="Window">
+          <h4>
+            <code>onappinstalled</code> attribute
+          </h4>
+          <p>
+            The <dfn>onappinstalled</dfn> is an <a>event handler IDL
+            attribute</a> for the "<dfn>appinstalled</dfn>" event type. The
+            interface used for these events is the <a><code>Event</code>
+            interface</a> [[!DOM]]. This event is dispatched as a result of a
+            <a data-lt="installation succeeded">successful installation</a>
+            (see the <a>steps to install the web application</a>).
+          </p>
+        </section>
+        <section data-dfn-for="Window">
+          <h4>
+            <code>onbeforeinstallprompt</code> attribute
+          </h4>
+          <p>
+            The <dfn>onbeforeinstallprompt</dfn> is an <a>event handler IDL
+            attribute</a> for the "<dfn>beforeinstallprompt</dfn>" event type.
+            The interface used for these events is the
+            <a>BeforeInstallPromptEvent</a> interface (see the <a>steps to
+            notify that an install prompt is available</a>).
+          </p>
+        </section>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Navigation scope
+      </h2>
+      <p data-link-for="WebAppManifest">
+        A <dfn>navigation scope</dfn> is a <a>URL</a> that represents the set
+        of URLs to which an <a>application context</a> can be navigated while
+        the manifest is <a>applied</a>. The <a>navigation scope</a> of a
+        manifest <var>manifest</var> is <var>manifest</var>["<a>scope</a>"].
+      </p>
+      <div class="note" data-link-for="WebAppManifest">
+        <p>
+          If the <a>scope</a> member is not present in the manifest, it
+          defaults to the parent path of the <a>start_url</a> member. For
+          example, if <a>start_url</a> is <code>/pages/welcome.html</code>, and
+          <a>scope</a> is missing, the navigation scope will be
+          <code>/pages/</code> on the same origin. If <a>start_url</a> is
+          <code>/pages/</code> (the trailing slash is important!), the
+          navigation scope will be <code>/pages/</code>.
+        </p>
+        <p>
+          Developers should take care, if they rely on the default behaviour,
+          that all of the application's page URLs begin with the parent path of
+          the start URL. To be safe, explicitly specify <a>scope</a>.
+        </p>
+      </div>
+      <p>
+        A <a>URL</a> <var>target</var> is said to be <dfn>within scope</dfn> of
+        <a>navigation scope</a> <var>scope</var> if the following algorithm
+        returns <code>true</code>:
+      </p>
+      <ol>
+        <li>Let <var>scopePath</var> be the elements of <var>scopes</var>'s
+        <a data-cite="!URL#concept-url-path">path</a>, separated by U+002F (/).
+        </li>
+        <li>Let <var>targetPath</var> be the elements of <var>target</var>'s
+        <a data-cite="!URL#concept-url-path">path</a>, separated by U+002F (/).
+        </li>
+        <li>If <var>target</var> is <a>same origin</a> as <var>scope</var> and
+        <var>targetPath</var> starts with <var>scopePath</var>, return
+        <code>true</code>.
+        </li>
+        <li>Otherwise, return <code>false</code>.
+        </li>
+      </ol>
+      <p>
+        A <a>URL</a> <var>target</var> is said to be <dfn data-lt=
+        "within-scope-manifest">within scope of a manifest</dfn>
+        <var>manifest</var> if <var>target</var> is <a>within scope</a> of the
+        navigation scope of <var>manifest</var>.
+      </p>
+      <div class="note" title="Scope is a simple string match">
+        The URL string matching in this algorithm is prefix-based rather than
+        path-structural (e.g. a target URL string
+        <code>/prefix-of/resource.html</code> will match an app with scope
+        <code>/prefix</code>, even though the path segment name is not an exact
+        match). This is intentional for consistency with <a data-cite=
+        "!SERVICE-WORKERS-1#scope-match-algorithm">Service Workers</a>. To
+        avoid unexpected behavior, use a scope ending in a <code>/</code>.
+      </div>
+      <p>
+        If the <a>application context</a>'s <a data-cite=
+        "!HTML#active-document">active document</a>'s <a data-cite=
+        "!DOM#concept-document-url">URL</a> is not <a data-lt=
+        "within-scope-manifest">within scope</a> of the <a>application
+        context</a>'s manifest, the user agent SHOULD show a prominent UI
+        element indicating the <a data-cite=
+        "!DOM#concept-document-url">document URL</a>, or at least its
+        <a>origin</a>, including whether it is served over a secure connection.
+        This UI SHOULD differ from any UI used when the <a data-cite=
+        "!DOM#concept-document-url">document URL</a> is <a>within scope</a>, in
+        order to make it obvious that the user is navigating off scope.
+      </p>
+      <div class="note">
+        <p>
+          Nothing prevents an <a>application context</a> from navigating to a
+          <a>URL</a> that is outside of the application's <a>navigation
+          scope</a>, while still having the <a>manifest</a> <a>applied</a> to
+          it.
+        </p>
+        <p>
+          Unlike previous versions of this specification, user agents are no
+          longer required or allowed to block off-scope navigations, or open
+          them in a new <a>top-level browsing context</a>. This practice broke
+          some sites that navigate to an off-scope URL (e.g., to perform
+          third-party authentication). See <a href=
+          "https://github.com/w3c/manifest/issues/646">Issue 646</a>.
+        </p>
+      </div>
+      <section data-link-for="DisplayModeType">
+        <h3 id="navigation-scope-security-considerations">
+          Security considerations
+        </h3>
+        <p>
+          The above recommendation (to show some UI when the <a>application
+          context</a> is navigated to an out-of-scope <a>URL</a>) is for
+          security reasons. It ensures that users are always aware of which
+          <a>origin</a> they are interacting with.
+        </p>
+      </section>
+      <section>
+        <h3>
+          Deep links
+        </h3>
+        <div class="issue" data-number="363"></div>
+        <p>
+          A <dfn>deep link</dfn> is a URL that is <a data-lt=
+          "within-scope-manifest">within scope</a> of an <a>installed</a> web
+          application's manifest.
+        </p>
+        <p>
+          An <a>application context</a> can be instantiated through a <a>deep
+          link</a>, in which case, the manifest is applied and the <a>deep
+          link</a> is loaded within the context of a web application.
+        </p>
+        <div class="note">
+          <p>
+            The concept of a <a>deep link</a> is useful in that it allows
+            hyperlinking from one installed application to another. This can be
+            from a native application to an <a>installed</a> web application
+            (and possibly vice versa!). Theoretically, this can provide
+            seamless context switching between native and web applications
+            through standard hyperlinks. And in the case where a particular web
+            application is not <a>installed</a>, the OS can just open the link
+            in the user's preferred web browser.
+          </p>
+          <p>
+            Implementers are encouraged make such context switching obvious to
+            the user, for example, by adhering to the human interface
+            guidelines of the underlying platform with respect to application
+            switching.
+          </p>
+        </div>
+      </section>
+    </section>
+    <section data-dfn-for="DisplayModeType" data-link-for="DisplayModeType">
+      <h2>
+        Display modes
+      </h2>
+      <p>
+        A <dfn>display mode</dfn> represents how the web application is being
+        presented within the context of an OS (e.g., in fullscreen, etc.).
+        Display modes correspond to user interface (UI) metaphors and
+        functionality in use on a given platform. The UI conventions of the
+        display modes are purely advisory and implementers are free to
+        interpret them how they best see fit.
+      </p>
+      <p>
+        Once a user agent applies a particular <a>display mode</a> to an
+        <a>application context</a>, it becomes the <dfn>default display
+        mode</dfn> for the <a>top-level browsing context</a> (i.e., it is used
+        as the display mode when the window is <a>navigated</a>). The user
+        agent MAY override the <a>default display mode</a> for security reasons
+        (e.g., the <a>top-level browsing context</a> is <a>navigated</a> to
+        another origin) and/or the user agent MAY provide the user with a means
+        of switching to another <a>display mode</a>.
+      </p>
+      <p>
+        When the <a data-link-for="WebAppManifest">display</a> member is
+        missing, or if there is no valid <a data-link-for=
+        "WebAppManifest">display</a> member, the user agent uses the
+        <a>browser</a> <a>display mode</a> as the <a>default display mode</a>.
+        As such, the user agent is REQUIRED to support the <a>browser</a>
+        <a>display mode</a>.
+      </p>
+      <p>
+        Each <a>display mode</a>, except <code>browser</code>, has a
+        <dfn>fallback display mode</dfn>, which is the <a>display mode</a> that
+        the user agent can try to use if it doesn't support a particular
+        <a>display mode</a>. If the user agent does support a <a>fallback
+        display mode</a>, then it checks to see if it can use that <a>display
+        mode</a>'s <a>fallback display mode</a>. This creates a fallback chain,
+        with the <a>default display mode</a> (<code>browser</code>) being the
+        last item in the chain.
+      </p>
+      <div class="example">
+        <p>
+          For example, SuperSecure Browser (a fictitious browser) only supports
+          the <code>minimal-ui</code> and <code>browser</code> display modes,
+          but a developer declares that she wants <code>fullscreen</code> in
+          the manifest. In this case, the user agent will first check if it
+          supports <code>fullscreen</code> (it doesn't), so it falls back to
+          <code>standalone</code> (which it also doesn't support), and
+          ultimately falls back to <code>minimal-ui</code>.
+        </p>
+      </div>
+      <p>
+        The <dfn>display modes values</dfn> defined by
+        <dfn>DisplayModeType</dfn>, and their corresponding <a>fallback display
+        modes</a> are as follows:
+      </p>
+      <dl>
+        <dt>
+          <dfn>fullscreen</dfn>
+        </dt>
+        <dd>
+          Opens the web application without any user agent chrome and takes up
+          the entirety of the available display area.
+        </dd>
+        <dd>
+          The <a>fallback display mode</a> for <code>fullscreen</code> is
+          <code>standalone</code>.
+        </dd>
+        <dt>
+          <dfn>standalone</dfn>
+        </dt>
+        <dd>
+          Opens the web application to look and feel like a standalone native
+          application. This can include the application having a different
+          window, its own icon in the application launcher, etc. In this mode,
+          the user agent will exclude standard browser UI elements such as an
+          URL bar, but can include other system UI elements such as a status
+          bar and/or system back button.
+        </dd>
+        <dd>
+          The <a>fallback display mode</a> for <code>standalone</code> is
+          <code>minimal-ui</code>.
+        </dd>
+        <dt>
+          <dfn>minimal-ui</dfn>
+        </dt>
+        <dd>
+          This mode is similar to <a>standalone</a>, but provides the end-user
+          with some means to access a minimal set of UI elements for
+          controlling navigation (i.e., back, forward, reload, and perhaps some
+          way of viewing the document's address). A user agent can include
+          other platform specific UI elements, such as "share" and "print"
+          buttons or whatever is customary on the platform and user agent.
+        </dd>
+        <dd>
+          The <a>fallback display mode</a> for <code>minimal-ui</code> is
+          <code>browser</code>.
+        </dd>
+        <dt>
+          <dfn>browser</dfn>
+        </dt>
+        <dd>
+          Opens the web application using the platform-specific convention for
+          opening hyperlinks in the user agent (e.g., in a browser tab or a new
+          window).
+        </dd>
+        <dd>
+          The <code>browser</code> <a>display mode</a> doesn't have a
+          <a>fallback display mode</a> (conforming user agents are required to
+          support the <code>browser</code> <a>display mode</a>).
+        </dd>
+      </dl>
+      <p class="note">
+        The <a>fullscreen</a> <a>display mode</a> is orthogonal to, and works
+        independently of, the [[WHATWG-FULLSCREEN]] API. The <a>fullscreen</a>
+        <a>display mode</a> affects the fullscreen state of the browser window,
+        while the [[WHATWG-FULLSCREEN]] API operates on an element contained
+        within the viewport. As such, a web application can have its <a>display
+        mode</a> set to <a>fullscreen</a>, while
+        <code>document.fullScreenElement</code> returns <code>null</code>, and
+        <code>fullscreenEnabled</code> returns <code>false</code>.
+      </p>
+      <section>
+        <h3>
+          Privacy and security considerations
+        </h3>
+        <p>
+          When the web application is running, it is RECOMMENDED that the user
+          agent provides the end-user a means to access common information
+          about the web application, such as the origin, start and/or current
+          URL, granted permissions, and associated icon. How such information
+          is exposed to end-users is left up to implementers.
+        </p>
+        <p>
+          Additionally, when applying a manifest that sets the <a>display
+          mode</a> to anything except "<a>browser</a>", it is RECOMMENDED that
+          the user agent clearly indicate to the end-user that their are
+          leaving the normal browsing context of a web browser. Ideally,
+          launching or switching to a web application is performed in a manner
+          that is consistent with launching or switching to other applications
+          in the host platform. For example, a long and obvious animated
+          transition, or speaking the text "Launching application X".
+        </p>
+      </section>
+      <section data-link-for="DisplayModeType">
+        <h3>
+          The <code>'display-mode'</code> media feature
+        </h3>
+        <p>
+          The <code><dfn>display-mode</dfn></code> media feature represents,
+          via a CSS media query [[!MEDIAQ]], the <a>display mode</a> of the web
+          application. This media feature applies to the top-level browsing
+          context and any child browsing contexts. Child browsing contexts
+          reflect the <a>display mode</a> of the <a>top-level browsing
+          context</a>.
+        </p>
+        <p>
+          A user agent MUST expose the '<code>display-mode</code>' media
+          feature irrespective of whether a manifest is being applied to a
+          browsing context. For example, if the end-user puts the whole user
+          agent into fullscreen, then the user agent would reflect this change
+          to CSS and scripts via the '<code>display-mode</code>' media feature.
+        </p>
+        <div class="note">
+          <p>
+            Please note that the <code>fullscreen</code> <a>display mode</a> is
+            not directly related to the CSS <code>:fullscreen</code>
+            pseudo-class specified in the [[WHATWG-FULLSCREEN]] API. The
+            <code>:fullscreen</code> pseudo-class matches exclusively when a
+            [[HTML]] element is put into the fullscreen element stack. However,
+            a side effect of calling the <code>requestFullscreen()</code>
+            method on an element using the [[WHATWG-FULLSCREEN]] API is that
+            the browser window can enter a fullscreen mode at the OS-level. In
+            such a case, both <code>:fullscreen</code> and <code>(display-mode:
+            fullscreen)</code> will match.
+          </p>
+          <p>
+            On some platforms, it is possible for a user to put a browser
+            window into fullscreen without the aid of the [[WHATWG-FULLSCREEN]]
+            API. When this happens, the <code>:fullscreen</code> pseudo class
+            will not match, but <code>(display-mode: fullscreen)</code> will
+            match. This is exemplified in CSS code below.
+          </p>
+          <pre class='example'>
+            /* applies when the window is fullscreen */
+            @media all and (display-mode: fullscreen) {
+                ...
+            }
+
+            /* applies when an element goes fullscreen */
+            #game:fullscreen {
+                ...
+            }
+        </pre>
+        </div>
+        <dl>
+          <dt>
+            Value:
+          </dt>
+          <dd>
+            <a>fullscreen</a> | <a>standalone</a> | <a>minimal-ui</a> |
+            <a>browser</a>
+          </dd>
+          <dt>
+            Applies to:
+          </dt>
+          <dd>
+            visual media types
+          </dd>
+          <dt>
+            Accepts min/max prefixes:
+          </dt>
+          <dd>
+            No
+          </dd>
+        </dl>
+        <p>
+          A user agent MUST reflect the applied <a>display mode</a> of the web
+          application via a CSS media query [[!MEDIAQ]].
+        </p>
+        <section>
+          <h4>
+            Examples
+          </h4>
+          <p>
+            An example in CSS:
+          </p>
+          <pre class="example js">
+            @media all and (display-mode: minimal-ui) {
+              /* ... */
+            }
+            @media all and (display-mode: standalone) {
+              /* ... */
+            }
+          </pre>
+          <p>
+            Accessing the display-mode media feature in ECMAScript through
+            <code>matchMedia()</code> of [[CSSOM-VIEW]]:
+          </p>
+          <pre class="example">
+            const standalone = matchMedia( '(display-mode: standalone)' );
+
+            standalone.onchange = (e) =&gt; {
+              /* handle changes to display mode */
+            }
+
+            if (standalone.matches) {
+              /* do standalone things */
+            }
+          </pre>
+        </section>
+        <section>
+          <h3>
+            Security and privacy considerations
+          </h3>
+          <p>
+            The <code>'display-mode'</code> media feature allows an origin
+            access to aspects of a user’s local computing environment and,
+            together with the <code>display</code> member, allows an origin
+            some measure of control over a user agent’s native UI: Through a
+            CSS media query, a script can know the display mode of a web
+            application. An attacker could, in such a case, exploit the fact
+            that an application is being displayed in fullscreen to mimic the
+            user interface of another application.
+          </p>
+        </section>
+      </section>
+    </section>
+    <section>
+      <h3>
+        Associating a resource with a manifest
+      </h3>
+      <p>
+        A resource is said to be <dfn>associated with a manifest</dfn> if the
+        resource representation, an HTML document, has a <a href=
+        "#linking"><code>manifest</code> link relationship</a>.
+      </p>
+      <section id="linking">
+        <h3>
+          Linking to a manifest
+        </h3>
+        <p>
+          The <code>manifest</code> keyword can be used with a [[!HTML]]
+          <a><code>link</code> element</a>. This keyword creates an <a>external
+          resource link</a>.
+        </p>
+        <table class="complex data">
+          <thead>
+            <tr>
+              <th rowspan="2">
+                Link type
+              </th>
+              <th colspan="2">
+                Effect on...
+              </th>
+              <th rowspan="2">
+                Brief description
+              </th>
+            </tr>
+            <tr>
+              <th>
+                <code><a>link</a></code>
+              </th>
+              <th>
+                <code><a>a</a></code> and <code><a>area</a></code>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>manifest</code>
+              </td>
+              <td>
+                <a>External Resource</a>
+              </td>
+              <td>
+                not allowed
+              </td>
+              <td>
+                Imports or links to a <a>manifest</a>.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The <a>media type for a manifest</a> serves as the default media type
+          for resources associated with the "<code>manifest</code>" <a>link
+          type</a>.
+        </p>
+        <p class="note">
+          In cases where more than one <a><code>link</code> element</a> with a
+          <code>manifest</code> link type appears in a <code>Document</code>,
+          the user agent uses the first <a><code>link</code> element</a> in
+          tree order and ignores all subsequent <a><code>link</code>
+          element</a> with a <code>manifest</code> link type (even if the first
+          element was erroneous). See the steps for <a>obtaining a
+          manifest</a>.
+        </p>
+        <p>
+          To obtain a manifest, the user agent MUST run the steps for
+          <a data-lt="obtaining the manifest">obtaining a manifest</a>. The
+          appropriate time to obtain the manifest is left up to
+          implementations. A user agent MAY opt to delay fetching a manifest
+          until after the document and its other resources have been fully
+          loaded (i.e., to not delay the availability of content and scripts
+          required by the <code>document</code>).
+        </p>
+        <p>
+          A <a>manifest</a> is obtained and applied regardless of the
+          <a>media</a> attribute of the <a><code>link</code> element</a>
+          matches the environment or not.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Manifest life-cycle
+      </h2>
+      <p>
+        This section defines algorithms for <a href="#obtaining">obtaining</a>,
+        <a href="#processing">processing</a>, and <a>applying</a> a
+        <a>manifest</a>.
+      </p>
+      <section id="obtaining">
+        <h3>
+          Obtaining a manifest
+        </h3>
+        <p>
+          The <dfn data-lt="obtaining the manifest|obtaining a manifest">steps
+          for obtaining a manifest</dfn> are given by the following algorithm.
+          The algorithm, if successful, returns a <a>processed manifest</a> and
+          the <var>manifest URL</var>; otherwise, it terminates prematurely and
+          returns nothing. In the case of nothing being returned, the user
+          agent MUST ignore the manifest declaration. In running these steps, a
+          user agent MUST NOT <a>delay the load event</a>.
+        </p>
+        <ol>
+          <li>From the <code>Document</code> of the <a>top-level browsing
+          context</a>, let <var>origin</var> be the <code>Document</code>'s
+          origin, and <var>manifest link</var> be the first
+          <a><code>link</code> element</a> in <a>tree order</a> whose <a><code>
+            rel</code> attribute</a> contains the token <code>manifest</code>.
+          </li>
+          <li>If <var>origin</var> is an [[!HTML]] <a>opaque origin</a>,
+          terminate this algorithm.
+          </li>
+          <li>If <var>manifest link</var> is <code>null</code>, terminate this
+          algorithm.
+          </li>
+          <li>If <var>manifest link</var>'s <code>href</code> attribute's value
+          is the empty <a>string</a>, then abort these steps.
+          </li>
+          <li>Let <var>manifest URL</var> be the result of <a>parsing</a> the
+          value of the <code>href</code> attribute, relative to <a>the
+          element's base URL</a>. If parsing fails, then abort these steps.
+          </li>
+          <li>Let <var>request</var> be a new [[!FETCH]] <a>request</a>, whose
+          URL is <var>manifest URL</var>, and whose <a>context</a> is
+          "<code>manifest</code>".
+          </li>
+          <li>If the <var>manifest link</var>'s <code>crossOrigin</code>
+          attribute's value is '<code>use-credentials</code>', then set
+          <var>request</var>'s credentials to '<code>include</code>'.
+          </li>
+          <li>Await the result of performing a <a>fetch</a> with
+          <var>request</var>, letting <var>response</var> be the result.
+          </li>
+          <li>If <var>response</var> is a <a>network error</a>, terminate this
+          algorithm.
+          </li>
+          <li>Let <var>text</var> be the result of <a>UTF-8 decoding</a> <var>
+            response</var>'s <a data-cite=
+            "!FETCH#concept-request-body">body</a>.
+          </li>
+          <li>Let <var>manifest</var> be the result of running <a>processing a
+          manifest</a> given <var>text</var>, <var>manifest URL</var>, and the
+          URL that represents the address of the <a>top-level browsing
+          context</a>.
+          </li>
+          <li>Return <var>manifest</var> and <var>manifest URL</var>.
+          </li>
+        </ol>
+        <div class="note">
+          <p>
+            Authors are encouraged to use the HTTP cache directives to
+            explicitly cache the manifest. For example, the following response
+            would cause a cached manifest to be used 30 days from the time the
+            response is sent:
+          </p>
+          <pre class="example http">
+            HTTP/1.1 200 OK
+            Cache-Control: max-age=2592000
+            Content-Type: application/manifest+json
+
+            {
+              "lang": "en",
+              "name": "Resist",
+              "start_url": "/start.html",
+              "display": "fullscreen",
+              "orientation": "landscape"
+            }
+          </pre>
+        </div>
+        <section>
+          <h4>
+            Content security policy
+          </h4>
+          <p>
+            A user agent MUST support [[!CSP3]].
+          </p>
+          <div class="example">
+            <p>
+              The <a>manifest-src</a> and <a>default-src</a> directives govern
+              the origins from which a <a>user agent</a> can fetch a manifest.
+              As with other directives, by default the <a>manifest-src</a>
+              directive is <code>*</code>, meaning that a user agent can,
+              [[FETCH]]'s <abbr>CORS</abbr> permitting, fetch the manifest
+              cross-domain. Remote origins (e.g., a <abbr title=
+              "content delivery network">CDN</abbr>) wanting to host manifests
+              for various web applications will need to include the appropriate
+              <abbr>CORS</abbr> response header in their HTTP response (e.g.,
+              <code>Access-Control-Allow-Origin: https://example.com</code>).
+            </p>
+            <figure>
+              <img src="images/manifest-src-directive.svg" width="704" height=
+              "342" alt="manifest-src directive example illustrated">
+              <figcaption>
+                For a [[HTML]] document, [[CSP3]]'s <a>manifest-src</a>
+                directive controls the sources from which a [[HTML]] document
+                can load a manifest from. The same CSP policy's
+                <code>img-src</code> directive controls where the icon's images
+                can be fetched from.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      </section>
+      <section id="processing" data-link-for="WebAppManifest">
+        <h3>
+          Processing the manifest
+        </h3>
+        <p>
+          When instructed to <dfn>issue a developer warning</dfn>, the user
+          agent MAY report the conformance violation to the developer in a
+          user-agent-specific manner (e.g., report the problem in an error
+          console), or MAY ignore the error and do nothing.
+        </p>
+        <p>
+          When instructed to <dfn>ignore</dfn>, the user agent MUST act as if
+          whatever manifest, member, or value caused the condition is absent.
+        </p>
+        <p>
+          The following algorithm provides an <dfn>extension point</dfn>: other
+          specifications that add new members to the manifest are encouraged to
+          hook themselves into this specification at this point in the
+          algorithm. They SHOULD NOT modify the existing values already in the
+          <var>manifest</var> object.
+        </p>
+        <div class="note">
+          <p>
+            The <a>extension point</a> is meant to help avoid <a href=
+            "https://annevankesteren.nl/2014/02/monkey-patch">issues related to
+            monkey patching</a>.
+          </p>
+        </div>
+        <p>
+          The steps for <dfn>processing a manifest</dfn> are given by the
+          following algorithm. The algorithm takes a <a>string</a>
+          <var>text</var> as an argument, which represents a <a>manifest</a>,
+          and a <a>URL</a> <var>manifest URL</var>, which represents the
+          location of the manifest, and a <a>URL</a> <var>document URL</var>.
+          The output from inputting an JSON document into this algorithm is a
+          <dfn>processed manifest</dfn>.
+        </p>
+        <p class="issue">
+          We need to catch throws associated with enumerations in IDL
+          conversion as the spec might gain new values over time not supported
+          by all exising browsers. This is especially important as we rely on
+          enums not defined in this specification.
+        </p>
+        <ol>
+          <li>Let <var>json</var> be the result of <a data-cite=
+          "!ECMASCRIPT#sec-json.parse">parsing</a> <var>text</var>. If
+          <a data-cite="!ECMASCRIPT#sec-json.parse">parsing</a> throws an
+          error:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a> with any details pertaining to
+                the JSON parsing error.
+              </li>
+              <li>Set <var>json</var> to be the result of <a data-cite=
+              "!ECMASCRIPT#sec-15.12.2">parsing</a> the <a>string</a>
+              <code>"{}"</code>.
+              </li>
+            </ol>
+          </li>
+          <li>If <a>Type</a>(<var>json</var>) is not Object:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a> that the manifest needs to be
+                an object.
+              </li>
+              <li>Set <var>json</var> to be the result of <a data-cite=
+              "!ECMASCRIPT#sec-15.12.2">parsing</a> the <a>string</a>
+              <code>"{}"</code>.
+              </li>
+            </ol>
+          </li>
+          <li>Let <var>manifest</var> be the result of <a data-lt=
+          "to idl dictionary value">converting</a> <var>json</var> to a
+          <a>WebAppManifest</a> dictionary.
+          </li>
+          <li>Set <var>manifest</var>["<a>start_url</a>"] to the result of
+          running <a>processing the <code>start_url</code> member</a> given
+          <var>manifest</var>["<a>start_url</a>"], <var>manifest URL</var>, and
+          <var>document URL</var>.
+          </li>
+          <li>Set <var>manifest</var>["<a>lang</a>"] to the result of running
+          <a>processing the <code>lang</code> member</a> given
+          <var>manifest</var>["<a>lang</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>scope</a>"] to the result of running
+          <a>processing the <code>scope</code> member</a> given
+          <var>manifest</var>["<a>scope</a>"], <var>manifest URL</var>, and
+          <var>manifest</var>["<a>start_url</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>theme_color</a>"] to the result of
+          running <a>processing the <code>theme_color</code> member</a> given
+          <var>manifest</var>["<a>theme_color</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>background_color</a>"] to the result
+          of running <a>processing the <code>background_color</code> member</a>
+          given <var>manifest</var>["<a>background_color</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>categories</a>"] to the result of
+          running <a>processing the <code>categories</code> member</a> given
+          <var>manifest</var>["<a>categories</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>icons</a>"] to the result of running
+          <a>processing ImageResource members</a> given
+          <var>manifest</var>["<a>icons</a>"], <var>manifest URL</var>, and
+          <code>"icons"</code>.
+          </li>
+          <li>Set <var>manifest</var>["<a>screenshots</a>"] to the result of
+          running <a>processing ImageResource members</a> given
+          <var>manifest</var>["<a>screenshots</a>"], <var>manifest URL</var>,
+          and <code>"screenshots"</code>.
+          </li>
+          <li>Set <var>manifest</var>["<a>related_applications</a>"] to the
+          result of running <a>processing the <code>related_applications</code>
+          member</a> given <var>manifest</var>["<a>related_applications</a>"].
+          </li>
+          <li>Set <var>manifest</var>["<a>serviceworker</a>"] to the result of
+          running <a>processing the <code>serviceworker</code> member</a> given
+          <var>manifest</var>["<a>serviceworker</a>"], <var>manifest URL</var>,
+          and <var>serviceworker</var>.
+          </li>
+          <li>
+            <a>Extension point</a>: process any proprietary and/or other
+            supported members at this point in the algorithm.
+          </li>
+          <li>Return <var>manifest</var>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3 id="applying">
+          Applying the manifest
+        </h3>
+        <p>
+          A <a>manifest</a> is <dfn data-lt="apply|applying">applied</dfn> to a
+          <a>top-level browsing context</a>, meaning that the members of the
+          <a>manifest</a> are affecting the presentation or behavior of a
+          browsing context.
+        </p>
+        <p>
+          A <a>top-level browsing context</a> that has a manifest applied to it
+          is referred to as an <dfn>application context</dfn>.
+        </p>
+        <p>
+          If an <a>application context</a> is created as a result of the user
+          agent being asked to <a>navigate</a> to a <a>deep link</a>, the user
+          agent MUST immediately <a>navigate</a> to the <a>deep link</a> with
+          <a>replacement enabled</a>. Otherwise, when the <a>application
+          context</a> is created, the user agent MUST immediately
+          <a>navigate</a> to the <a>start URL</a> with <a>replacement
+          enabled</a>.
+        </p>
+        <div class="note">
+          <p>
+            The <a>start URL</a> is not necessarily the value of the
+            <a data-link-for="WebAppManifest"><code>start_url</code></a>
+            member: the user or user agent could have changed it when the
+            application was <a>installed</a>.
+          </p>
+        </div>
+        <p>
+          The appropriate time to <a>apply</a> a manifest is when the
+          <a>application context</a> is created and before <a>navigation</a> to
+          the <a>start URL</a> begins.
+        </p>
+      </section>
+      <section id="updating">
+        <h3>
+          Updating the manifest
+        </h3>
+        <div class="issue" data-number="446"></div>
+      </section>
+    </section>
+    <section data-dfn-for="WebAppManifest" data-link-for="WebAppManifest">
+      <h2>
+        <dfn>WebAppManifest</dfn> dictionary
+      </h2>
+      <pre class="idl">
+          dictionary WebAppManifest {
+             TextDirectionType dir = "auto";
+             DOMString lang;
+             USVString name;
+             USVString short_name;
+             USVString description;
+             sequence&lt;ImageResource&gt; icons;
+             sequence&lt;ImageResource&gt; screenshots;
+             sequence&lt;USVString&gt; categories;
+             DOMString iarc_rating_id;
+             USVString start_url;
+             DisplayModeType display = "browser";
+             OrientationLockType orientation;
+             USVString theme_color;
+             USVString background_color;
+             USVString scope;
+             ServiceWorkerRegistrationObject serviceworker;
+             sequence&lt;ExternalApplicationResource&gt; related_applications;
+             boolean prefer_related_applications = "false";
+          };
+      </pre>
+      <p>
+        A <dfn>manifest</dfn> is a JSON document that contains startup
+        parameters and application defaults for when a web application is
+        launched.
+      </p>
+      <p>
+        Every manifest has an associated <dfn>manifest URL</dfn>, which is the
+        [[!URL]] from which the <a>manifest</a> was fetched.
+      </p>
+      <section>
+        <h3>
+          <code>dir</code> member
+        </h3>
+        <pre class="idl">
+            enum TextDirectionType { "ltr", "rtl", "auto" };
+        </pre>
+        <p>
+          The <dfn>dir</dfn> member specifies the <dfn>base direction</dfn> for
+          the <a>directionality-capable members</a> of the <a>manifest</a>. The
+          <a>dir</a> member's value can be set to one of the <a>text-direction
+          values</a>.
+        </p>
+        <p>
+          The <dfn>directionality-capable members</dfn> are:
+        </p>
+        <ul>
+          <li>
+            <a>description</a> member.
+          </li>
+          <li>
+            <a>name</a> member.
+          </li>
+          <li>
+            <a>short_name</a> member.
+          </li>
+        </ul>
+        <p>
+          The <dfn data-lt="text-direction value">text-direction values</dfn>
+          defined by <dfn>TextDirectionType</dfn>, are the following, implying
+          that the value of the <a>directionality-capable members</a> is by
+          default:
+        </p>
+        <dl data-dfn-for="TextDirectionType">
+          <dt>
+            <dfn>ltr</dfn>
+          </dt>
+          <dd>
+            left-to-right text.
+          </dd>
+          <dt>
+            <dfn>rtl</dfn>
+          </dt>
+          <dd>
+            right-to-left text.
+          </dd>
+          <dt>
+            <dfn>auto</dfn>
+          </dt>
+          <dd>
+            <a data-lt=
+            "steps to programmatically determine the directionality of a member">
+            programmatically determined</a> from the value of the member.
+          </dd>
+        </dl>
+        <p>
+          When displaying the <a>directionality-capable members</a> to an
+          end-user, the user agent MUST use the <a>base direction</a> to
+          compute directional runs and layout or position text correctly in
+          text containing mixed-direction sequences [[!BIDI]]. When the <a>base
+          direction</a> is "<a data-link-for="TextDirectionType">auto</a>" the
+          user agent MUST run the <a>steps to programmatically determine the
+          directionality of a member</a> - and use the resulting
+          <a>text-direction value</a> to assist in displaying the value of the
+          member.
+        </p>
+        <p>
+          The <dfn>steps to programmatically determine the directionality of a
+          member</dfn> are as follows. The algorithm takes the <var>value</var>
+          of a member.
+        </p>
+        <ol>
+          <li>Find the first character (in logical order) of the
+          <var>value</var> that is of bidirectional character type L, AL, or R
+          [[!BIDI]].
+          </li>
+          <li>If such a character is found and it is of bidirectional character
+          type AL or R, return <code>"rtl"</code>.
+          </li>
+          <li>Otherwise, return <code>"ltr"</code>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <code>lang</code> member
+        </h3>
+        <p>
+          The <dfn>lang</dfn> member is a <a>language tag</a> (<a>string</a>)
+          that specifies the primary language for the values of the manifest's
+          <a>directionality-capable members</a> (as knowing the language can
+          also help with directionality).
+        </p>
+        <p>
+          A <dfn>language tag</dfn> is a <a>string</a> that matches the
+          production of a <code>Language-Tag</code> defined in the [[!BCP47]]
+          specifications (see the <a href=
+          "https://www.iana.org/assignments/language-subtag-registry">IANA
+          Language Subtag Registry</a> for an authoritative list of possible
+          values). That is, a language range is composed of one or more
+          <dfn>subtags</dfn> that are delimited by a U+002D HYPHEN-MINUS ("-").
+          For example, the '<code>en-AU</code>' language range represents
+          English as spoken in Australia, and '<code>fr-CA</code>' represents
+          French as spoken in Canada. Language tags that meet the validity
+          criteria of [[!RFC5646]] section 2.2.9 that can be verified without
+          reference to the IANA Language Subtag Registry are considered
+          structurally valid.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>lang</code> member</dfn> is
+          given by the following algorithm. The algorithm takes a
+          <a>WebAppManifest</a> <var>manifest</var> as an argument. This
+          algorithm returns a <code>DOMString?</code>.
+        </p>
+        <ol>
+          <li>Let <var>value</var> be <var>manifest</var>["lang"].
+          </li>
+          <li>If <a>Type</a>(<var>value</var>) is String:
+            <ol>
+              <li>If calling <a>IsStructurallyValidLanguageTag</a> with
+              <var>value</var> as the argument returns <code>false</code>,
+              then:
+                <ol>
+                  <li>
+                    <a>Issue a developer warning</a> that the <var>value</var>
+                    is invalid.
+                  </li>
+                  <li>Return <code>undefined</code>.
+                  </li>
+                </ol>
+              </li>
+              <li>Otherwise, return the result of calling the
+              <a>CanonicalizeLanguageTag</a> abstract operation, passing <var>
+                V</var> as the argument.
+              </li>
+            </ol>
+          </li>
+          <li>Return <code>undefined</code>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <code title="">name</code> member
+        </h3>
+        <p>
+          The <dfn>name</dfn> member is a <a>string</a> that represents the
+          name of the web application as it is usually displayed to the user
+          (e.g., amongst a list of other applications, or as a label for an
+          icon).
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code title="">short_name</code> member
+        </h3>
+        <p>
+          The <dfn>short_name</dfn> member is a <a>string</a> that represents a
+          short version of the name of the web application. It is intended to
+          be used where there is insufficient space to display the full name of
+          the web application.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code title="">description</code> member
+        </h3>
+        <p>
+          The <dfn>description</dfn> member allows the developer to describe
+          the purpose of the web application.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code>scope</code> member
+        </h3>
+        <div class="issue" data-number="380"></div>
+        <p>
+          The <dfn>scope</dfn> member is a <a>string</a> that represents the
+          navigation scope of this web application's <a>application
+          context</a>.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>scope</code> member</dfn> is
+          given by the following algorithm. The algorithm takes a
+          <a>USVString</a> <var>value</var>, a <a>URL</a> <var>manifest
+          URL</var>, and a URL <var>start URL</var>. This algorithm returns a
+          <a>URL</a>.
+        </p>
+        <ol>
+          <li>Let <var>default</var> be the result of <a>parsing</a> ".", using
+          <var>start URL</var> as the <var>base</var> URL.
+          </li>
+          <li>If <var>value</var> is the empty <a>string</a>, then return <var>
+            default</var>.
+          </li>
+          <li>Let <var>scope URL</var> be the result of <a>parsing</a>
+          <var>value</var>, using <var>manifest URL</var> as the
+          <var>base</var> URL.
+          </li>
+          <li>If <var>scope URL</var> is failure:
+            <ul>
+              <li>
+                <a>Issue a developer warning</a>.
+              </li>
+              <li>Return <var>default</var>.
+              </li>
+            </ul>
+          </li>
+          <li>If <var>start URL</var> is not <a>within scope</a> of scope URL:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a> that the start URL is not
+                <a>within scope</a> of the scope URL.
+              </li>
+              <li>Return <var>default</var>.
+              </li>
+            </ol>
+          </li>
+          <li>Otherwise, return <var>scope URL</var>.
+          </li>
+        </ol>
+        <div class="note">
+          The default scope (if <code>scope</code> is omitted or an error) is
+          the <var>start URL</var>, with its filename, query, and fragment
+          removed.
+        </div>
+      </section>
+      <section>
+        <h3>
+          <code title="">icons</code> member
+        </h3>
+        <p>
+          The <dfn>icons</dfn> member is an <a>array</a> of
+          <a>ImageResource</a>s that can serve as iconic representations of the
+          web application in various contexts. For example, they can be used to
+          represent the web application amongst a list of other applications,
+          or to integrate the web application with an <abbr title=
+          "operating system">OS</abbr>'s task switcher and/or system
+          preferences.
+        </p>
+        <p>
+          If there are multiple equally appropriate icons in <var>icons</var>,
+          a user agent MUST use the last one declared in order at the time that
+          the user agent collected the list of <var>icons</var>. If the user
+          agent tries to use an icon but that icon is determined, upon closer
+          examination, to in fact be inappropriate (e.g. because its content
+          type is unsupported), then the user agent MUST try the
+          next-most-appropriate icon as determined by examining the
+          <a>ImageResource</a>'s members.
+        </p>
+        <div class="example">
+          <p>
+            In the following example, the developer has made the following
+            choices about the icons associated with the web application:
+          </p>
+          <ul>
+            <li>The developer has included two icons at the same size, but in
+            two different formats. One is explicitly marked as WebP through the
+            <code>type</code> member. If the user agent doesn't support WebP,
+            it falls back to the second icon of the same size. The media type
+            of this icon can then be either determined via a HTTP header, or
+            can be sniffed by the user agent once the first few bytes of the
+            icon are received.
+            </li>
+            <li>The developer wants to use an SVG for greater than or equal to
+            257x257px. She has found that the SVG file looks too blurry at
+            small sizes, even on high-density screens. To deal with this
+            problem, she's included an SVG icon that is only used when the
+            dimensions are at least 257px. Otherwise, the user agent uses the
+            ICO file (hd_hi.ico), which includes a gamut of raster icons
+            individually tailored for small display sizes.
+            </li>
+          </ul>
+          <pre class="example json">
+            {
+              "icons": [
+                {
+                  "src": "icon/lowres.webp",
+                  "sizes": "48x48",
+                  "type": "image/webp"
+                },{
+                  "src": "icon/lowres",
+                  "sizes": "48x48"
+                },{
+                  "src": "icon/hd_hi.ico",
+                  "sizes": "72x72 96x96 128x128 256x256"
+                },{
+                  "src": "icon/hd_hi.svg",
+                  "sizes": "257x257"
+                }]
+            }
+          </pre>
+        </div>
+      </section>
+      <section>
+        <h3>
+          <code>display</code> member
+        </h3>
+        <pre class="idl">
+          enum DisplayModeType {
+            "fullscreen",
+            "standalone",
+            "minimal-ui",
+            "browser"
+          };
+        </pre>
+        <p>
+          The <dfn>display</dfn> member is a <a>DisplayModeType</a>, whose
+          value is one of <a>display modes values</a>. The item represents the
+          developer's preferred <a>display mode</a> for the web application.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code>orientation</code> member
+        </h3>
+        <p>
+          The <dfn>orientation</dfn> member is a <a>string</a> that serves as
+          the <a>default orientation</a> for all <a>top-level browsing
+          contexts</a> of the web application. The possible values are those of
+          the <a>OrientationLockType</a> enum defined in
+          [[!SCREEN-ORIENTATION]].
+        </p>
+        <p>
+          If the user agent honors the value of the <a>orientation</a> member
+          as the <a>default orientation</a>, then that serves as the <a>default
+          orientation</a> for the life of the web application (unless
+          overridden by some other means at runtime). This means that the user
+          agent MUST return the orientation to the <a>default orientation</a>
+          any time the orientation is unlocked [[!SCREEN-ORIENTATION]] or the
+          <a>top-level browsing context</a> is <a>navigated</a>.
+        </p>
+        <p>
+          Although the specification relies on the [[!SCREEN-ORIENTATION]]'s
+          <a>OrientationLockType</a>, it is OPTIONAL for a user agent to
+          implement the [[!SCREEN-ORIENTATION]] API. Supporting the
+          [[!SCREEN-ORIENTATION]] API is, of course, RECOMMENDED.
+        </p>
+        <p>
+          Certain UI/UX concerns and/or platform conventions will mean that
+          some screen orientations and display modes <dfn>cannot be used
+          together</dfn>. Which orientations and display modes cannot be used
+          together is left to the discretion of implementers. For example, for
+          some user agents, it might not make sense to change the <a>default
+          orientation</a> of an application while in <code>browser</code>
+          <a>display mode</a>.
+        </p>
+        <p class="note">
+          Once the web application is running, other means can change the
+          orientation of a <a>top-level browsing context</a> (such as via
+          [[SCREEN-ORIENTATION]] API).
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code>start_url</code> member
+        </h3>
+        <p>
+          The <dfn>start_url</dfn> member is a <a>string</a> that represents
+          the <dfn>start URL</dfn> , which is <a>URL</a> that the developer
+          would prefer the user agent load when the user launches the web
+          application (e.g., when the user clicks on the icon of the web
+          application from a device's application menu or homescreen).
+        </p>
+        <p>
+          The <a>start_url</a> member is purely advisory, and a user agent MAY
+          <a>ignore</a> it or provide the end-user the choice not to make use
+          of it. A user agent MAY also allow the end-user to modify the URL
+          when, for instance, a bookmark for the web application is being
+          created or any time thereafter.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>start_url</code> member</dfn>
+          are given by the following algorithm. The algorithm takes a
+          <a>USVString</a> <var>value</var>, a <a>URL</a> <var>manifest
+          URL</var>, and a <a>URL</a> <var>document URL</var>. This algorithm
+          returns a <a>URL</a>.
+        </p>
+        <ol>
+          <li>If <var>value</var> is the empty <a>string</a>, return
+          <var>document URL</var>.
+          </li>
+          <li>Let <var>start URL</var> be the result of <a>parsing</a>
+          <var>value</var>, using <var>manifest URL</var> as the
+          <var>base</var> URL.
+          </li>
+          <li>If <var>start URL</var> is failure:
+            <ul>
+              <li>
+                <a>Issue a developer warning</a>.
+              </li>
+              <li>Return <var>document URL</var>.
+              </li>
+            </ul>
+          </li>
+          <li>If <var>start URL</var> is not <a>same origin</a> as
+          <var>document URL</var>:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a> that the <a>start_url</a>
+                needs to be <a>same-origin</a> as <code>Document</code> of the
+                <a>top-level browsing context</a>.
+              </li>
+              <li>Return <var>document URL</var>.
+              </li>
+            </ol>
+          </li>
+          <li>Otherwise, return <var>start URL</var>.
+          </li>
+        </ol>
+        <div class="example">
+          <p>
+            For example, if the value of <a>start_url</a> is
+            <samp>../start_point.html</samp>, and the manifest's URL is
+            <samp>https://example.com/resources/manifest.webmanifest</samp>,
+            then the result of <a>URL parsing</a> would be
+            <samp>https://example.com/start_point.html</samp>.
+          </p>
+        </div>
+        <section>
+          <h3>
+            Privacy consideration: <a>start_url</a> tracking
+          </h3>
+          <p>
+            It's conceivable that the <a>start_url</a> could be crafted to
+            indicate that the application was launched from outside the browser
+            (e.g., <code>"start_url": "index.html?launcher=homescreen"</code>).
+            This can be useful for analytics and possibly other customizations.
+            However, it is also conceivable that developers could encode
+            strings into the start_url that uniquely identify the user (e.g., a
+            server assigned <abbr>UUID</abbr>). This is fingerprinting/privacy
+            sensitive information that the user might not be aware of.
+          </p>
+          <p>
+            Given the above, it is RECOMMENDED that, upon installation, or any
+            time thereafter, a user agent allows the user to inspect and, if
+            necessary, modify the <a>start URL</a> of an application.
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>
+          <code>serviceworker</code> member
+        </h3>
+        <p>
+          The <dfn>serviceworker</dfn> member describes a service worker as
+          defined in [[!SERVICE-WORKERS-1]].
+        </p>
+        <p>
+          The <a>serviceworker</a> member represents an intented <a href=
+          "https://w3c.github.io/ServiceWorker/#service-worker-registration-concept">
+          service worker registration</a> in form of a <dfn>registration
+          object</dfn>
+        </p>
+        <p class="note">
+          Other service worker registrations can be done, for instance by a
+          script; if these have different scopes they will be considered
+          separate registrations. If they have the same scope and script URL,
+          they coalesce. If they have different script URLs, last one wins.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>serviceworker</code>
+          member</dfn> are given by the following algorithm. The algorithm
+          takes a <a>ServiceWorkerRegistrationObject</a>
+          <var>registration</var>. This algorithm returns a
+          <a>ServiceWorkerRegistrationObject</a> <var>registration</var>, which
+          can be <code>undefined</code>.
+        </p>
+        <ol>
+          <li>If <var>registration</var> is <code>undefined</code>, return
+          <code>undefined</code>.
+          </li>
+          <li>Set <var>registration</var>["src"] to the result of running
+          <a>processing the <code>src</code> member of a service worker</a>
+          given <var>registration</var>["src"] and <var>manifest URL</var>.
+          </li>
+          <li>If the result of running <a>is origin potentially trustworthy</a>
+          with the origin of <var>registration</var>["src"] is <code>Not
+          Trusted</code>, <a>issue a developer warning</a>, abort these steps
+          and return <code>undefined</code>.
+          </li>
+          <li>Set <var>registration</var>["scope"] to the result of running <a>
+            processing the <code>scope</code> member of a service worker</a>
+            given <var>registration</var>["scope"].
+          </li>
+          <li>Return <var>registration</var>.
+          </li>
+        </ol>
+        <div class="example">
+          In the following example, the web application is listing a service
+          worker for the <code>/foo</code> scope, bypassing the user agent
+          cache when fetching the <code>"sw.js"</code> source:
+          <pre class="example js">
+            "serviceworker": {
+              "src": "sw.js",
+              "scope": "/foo",
+              "update_via_cache": "none"
+            }
+          </pre>
+        </div>
+      </section>
+      <section>
+        <h3>
+          <code title="">theme_color</code> member
+        </h3>
+        <p>
+          The <dfn>theme_color</dfn> member serves as the <dfn>default theme
+          color</dfn> for an application context. What constitutes a <dfn>theme
+          color</dfn> is defined in [[!HTML]].
+        </p>
+        <p>
+          If the user agent honors the value of the <code>theme_color</code>
+          member as the <a>default theme color</a>, then that color serves as
+          the <a>theme color</a> for all browsing contexts to which the
+          manifest is <a>applied</a>. However, a document may override the
+          <a>default theme color</a> through the inclusion of a valid [[!HTML]]
+          <code>meta</code> element whose <code>name</code> attribute is
+          "theme-color".
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>theme_color</code>
+          member</dfn> are given by the following algorithm. The algorithm
+          takes a <a>USVString</a> <var>theme color</var> as an argument. This
+          algorithm returns a <code>USVString?</code>.
+        </p>
+        <ol>
+          <li>Let <var>potential color</var> be the result of running
+          [[!CSS-SYNTAX-3]]'s <a>parse a component value</a> algorithm with
+          <var>theme color</var> as input. If parsing returns a syntax error,
+          return <code>undefined</code>.
+          </li>
+          <li>Let <var>color</var> be the result of attempting to parse
+          <var>potential color</var> as a CSS color, as per [[!CSS-SYNTAX-3]].
+          If parsing fails:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a>.
+              </li>
+              <li>Return <code>undefined</code>.
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>color</var>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <code title="">related_applications</code> member
+        </h3>
+        <p>
+          A <dfn>related application</dfn> is an application accessible to the
+          underlying application platform that has a relationship with the web
+          application <a>associated with a manifest</a>.
+        </p>
+        <p>
+          The <dfn>related_applications</dfn> member lists <a>related
+          applications</a> and serves as an indication of such a relationship
+          between web application and <a>related applications</a>. This
+          relationship is unidirectional and unless a listed application claims
+          the same relationship, the <a>user agent</a> MUST NOT assume a
+          bi-directional endorsement.
+        </p>
+        <p>
+          Example of usages of the <code>related_applications</code> could be a
+          crawler that would use that information to gather more information
+          about the web application or a browser that could suggest a listed
+          application as an alternative if the user wants to install the web
+          application.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>related_applications</code>
+          member</dfn> are given by the following algorithm. The algorithm
+          takes a sequence&lt;<a>ExternalApplicationResource</a>&gt;
+          <var>related applications</var> as an argument. This algorithm
+          returns an <a data-cite=
+          "WEBIDL#sequence">sequence</a>&lt;<a>ExternalApplicationResource</a>&gt;.
+        </p>
+        <ol>
+          <li>Let <var>relatedApplications</var> be a new Array object created
+          as if by the expression [].
+          </li>
+          <li>
+            <a>For each</a> <var>app</var> of <var>related applications</var>:
+            <ol>
+              <li>if neither <var>app</var>["src"] nor <var>app</var>["url"]
+              are <code>undefined</code>:
+                <ol>
+                  <li>Set <var>app</var>["url"] to the result of running
+                  <a>processing the <code>url</code> member of an
+                  application</a> given <var>app</var>["url"].
+                  </li>
+                  <li>
+                    <a data-lt="list-append">Append</a> <var>app</var> to
+                    <var>relatedApplications</var>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>relatedApplications</var>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <code title="">prefer_related_applications</code> member
+        </h3>
+        <p>
+          The <dfn>prefer_related_applications</dfn> member is a boolean value
+          that is used as a hint for the user agent to say that <a>related
+          applications</a> should be preferred over the web application. If the
+          <code>prefer_related_applications</code> is set to <code>true</code>,
+          and the user agent wants to suggest to install the web application,
+          the user agent might want to suggest installing one of the <a>related
+          applications</a> instead.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code title="">background_color</code> member
+        </h3>
+        <p>
+          The <dfn>background_color</dfn> member describes the expected
+          background color of the web application. It repeats what is already
+          available in the application stylesheet but can be used by the
+          <a>user agent</a> to draw the background color of a web application
+          for which the manifest is known before the files are actually
+          available, whether they are fetched from the network or retrieved
+          from disk.
+        </p>
+        <p>
+          The <a>background_color</a> member is only meant to improve the user
+          experience while a web application is loading and MUST NOT be used by
+          the <a>user agent</a> as the background color when the web
+          application's stylesheet is available.
+        </p>
+        <p>
+          The steps for <dfn>processing the <a>background_color</a>
+          member</dfn> are given by the following algorithm. The algorithm
+          takes a <a>USVString</a> <var>background color</var> as an argument.
+          This algorithm returns a <code>USVString?</code>.
+        </p>
+        <ol>
+          <li>Let <var>potential color</var> be the result of running
+          [[!CSS-SYNTAX-3]]'s <a>parse a component value</a> algorithm with
+          <var>background color</var> as input. If parsing returns a syntax
+          error, return <code>undefined</code>.
+          </li>
+          <li>Let <var>color</var> be the result of attempting to parse
+          <var>potential color</var> as a CSS color, as per [[!CSS-SYNTAX-3]].
+          If parsing fails:
+            <ol>
+              <li>
+                <a>Issue a developer warning</a>.
+              </li>
+              <li>Return <code>undefined</code>.
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>color</var>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <code title="">categories</code> member
+        </h3>
+        <p>
+          The <dfn>categories</dfn> member describes the expected application
+          categories to which the web application belongs.
+        </p>
+        <p>
+          The <a>categories</a> member is only meant as a hint to catalogs or
+          stores listing web applications and it is expected that these will
+          make a best effort to find appropriate categories (or category) under
+          which to list the web application. Like search engines and meta
+          keywords, catalogs and stores are not required to honor this hint.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>categories</code>
+          member</dfn> are given by the following algorithm. The algorithm
+          takes a sequence&lt;<a>USVString</a>&gt; <var>categories</var> as an
+          argument. This algorithm returns an
+          <code>Array&lt;USVString&gt;</code>.
+        </p>
+        <ol>
+          <li>
+            <a>For each</a> <var>category</var> of <var>categories</var>:
+            <ol>
+              <li>
+                <a data-lt="set-replace">Replace</a> <var>category</var> within
+                <var>categories</var> with <var>category</var>,
+                <a>lowercased</a>.
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>categories</var>.
+          </li>
+        </ol>
+        <p>
+          The categories <a>string</a> array is case insensitive and converted
+          to lower-case by following the processing algorithm. Thus,
+          <code>sports</code>, <code>Sports</code>, <code>SPORTS</code>, and
+          <code>SpOrTs</code> are all equivalent.
+        </p>
+        <p class="note">
+          Manifest authors are encouraged to use lower-case.
+        </p>
+        <p class="note">
+          This specification does not define the particular values for
+          <dfn>USVString</dfn>s for the <a>categories</a> member. However, the
+          working group maintains a <a href=
+          "https://github.com/w3c/manifest/wiki/Categories">list of known
+          values</a> in our wiki.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code title="">screenshots</code> member
+        </h3>
+        <p>
+          The <dfn>screenshots</dfn> member is an <a>array</a> of
+          <a>ImageResource</a>s, representing the web application in common
+          usage scenarios.
+        </p>
+      </section>
+      <section>
+        <h3>
+          <code title="">iarc_rating_id</code> member
+        </h3>
+        <p>
+          The <dfn>iarc_rating_id</dfn> member is a <a>string</a> that
+          represents the <a href="https://www.globalratings.com/">International
+          Age Rating Coalition (IARC)</a> certification code of the web
+          application. It is intended to be used to determine which ages the
+          web application is appropriate for.
+        </p>
+        <p class="note">
+          An IARC certificate can be obtained via participating storefronts,
+          intended to be used for distributing the web app. The
+          <a>iarc_rating_id</a> member only takes a single certification code.
+          The same code can be shared across participating storefronts, as long
+          as the distributed product remains the same (i.e., doesn’t serve
+          totally different code paths depending on user agent sniffing and the
+          like) and the other storefronts support it.
+        </p>
+        <div class="informative">
+          <p>
+            The following shows a very simple <a>manifest</a> with the
+            <code>iarc_rating_id</code> member.
+          </p>
+          <pre class="example json" title="very simple manifest">
+          {
+            "name": "Donate App",
+            "description": "This app helps you donate to worthy causes.",
+            "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+            "icons": [{
+              "src": "images/icon.png",
+              "sizes": "192x192"
+            }]
+          }
+        </pre>
+        </div>
+        <p>
+          More information on the IARC can be found at: <a href=
+          "https://www.globalratings.com/how-iarc-works.aspx">How IARC
+          Works</a> and <a href=
+          "https://www.globalratings.com/for-developers.aspx">How developers
+          can get their games and apps rated with IARC</a>.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>
+        <dfn>ImageResource</dfn> and its members
+      </h2>
+      <pre class="idl">
+        dictionary ImageResource {
+          required USVString src;
+          DOMString sizes;
+          USVString type;
+          USVString purpose;
+          USVString platform;
+        };
+      </pre>
+      <p>
+        Each <a>ImageResource</a> represents an image that is used as part of a
+        web application, suitable to use in various contexts depending on the
+        semantics of the member that is using the object (e.g., an icon that is
+        part of an application menu, etc.). For an image resource, this
+        specification provides developers with a means of specifying the
+        dimensions, and media type of an image (i.e., a "responsive image"
+        solution [[RESPIMG-USECASES]]). A user agent can use these values to
+        select an image that is best suited to display on the end-user's device
+        or most closely matches the end-user's preferences.
+      </p>
+      <p>
+        User agents may modify the images associated with an
+        <a>ImageResource</a> to better match the platform’s visual style before
+        displaying it to the user, for example by rounding the corners or
+        painting it in a specific color. It is recommended that developers
+        prepare their image resources for such scenarios to avoid losing
+        important information through, e.g., change of color or clipped
+        corners.
+      </p>
+      <section>
+        <h3>
+          Fetching image resources
+        </h3>
+        <p>
+          To <a>fetch</a> the image associated with an <a>ImageResource</a>,
+          the user agent MUST run the <dfn>steps to fetch an image
+          resource</dfn>. The algorithm takes an <var>image URL</var>
+          (<a>ImageResource.src</a>), the <var>manifest URL</var>, and the
+          <var>document</var> (<code>Document</code>) from which the manifest
+          was linked. It returns a <a>Response</a>:
+        </p>
+        <ol>
+          <li>Let <var>request</var> be a new <a>Request</a>.
+          </li>
+          <li>Set the following properties of <var>request</var>:
+            <ol>
+              <li>
+                <var>url</var> is set to <var>image URL</var>.
+              </li>
+              <li>
+                <var>initiator</var> is "<code>manifest</code>".
+              </li>
+              <li>
+                <var>type</var> is "<code>image</code>".
+              </li>
+              <li>
+                <var>cors</var> is "<code>no-cors</code>".
+              </li>
+              <li>
+                <var>referrer</var> is <var>manifest URL</var>.
+              </li>
+              <li>
+                <var>client</var> is <var>document</var>.
+              </li>
+            </ol>
+          </li>
+          <li>Perform a <a>fetch</a> using <var>request</var> and return the
+          <var>response</var>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Content security policy of image resources
+        </h3>
+        <p>
+          The security policy that governs whether a <a>user agent</a> can
+          fetch an icon image is governed by the <code>img-src</code> directive
+          [[!CSP3]] associated with the manifest's owner <code>Document</code>.
+        </p>
+        <div class="example">
+          <p>
+            For example, given the following <code>img-src</code> directive in
+            the <code>Content-Security-Policy</code> HTTP header of the
+            manifest's owner <code>Document</code>:
+          </p>
+          <pre class="example http">
+            HTTP/1.1 200 OK
+            Content-Type: text/html
+            Content-Security-Policy: img-src icons.example.com
+
+            &lt;!doctype&gt;
+            &lt;html&gt;
+            &lt;link rel="manifest" href="manifest.webmanifest"&gt;
+          </pre>
+          <p>
+            And given the following <code>manifest.webmanifest</code>:
+          </p>
+          <pre class="example json">
+            {
+              "name": "custom manifest",
+              "start_url": "https://boo",
+              "icons": [
+                {
+                  "src": "//icons.example.com/lowres"
+                },
+                {
+                  "src": "//other.com/hi-res"
+                }
+              ]
+            }
+          </pre>
+          <p>
+            The fetching of icon resources from
+            <code>icons.example.com/lowres</code> would succeed, while fetching
+            from <code>other.com/hi-res</code> would fail.
+          </p>
+        </div>
+      </section>
+      <section data-dfn-for="ImageResource" data-link-for="ImageResource">
+        <h3>
+          <dfn>purpose</dfn> member
+        </h3>
+        <p>
+          The <a>purpose</a> member is an <a>unordered set of unique
+          space-separated tokens</a> that are <a>ASCII case-insensitive</a>.
+          The allowed values are the <a>icon purposes</a>.
+        </p>
+        <p>
+          When an <a>ImageResource</a> is used as an <dfn>icon</dfn>, a
+          developer can hint that the image is intended to serve some special
+          purpose in the context of the host OS (i.e., for better integration).
+        </p>
+        <p>
+          For example, as a <a data-lt="badge purpose">badge</a> or "pinned"
+          icon that is visually distinct, in color or form, from an
+          application's launch icon. The user agent uses the value of the
+          <a>purpose</a> member as a hint to determine where and how an
+          <a>ImageResource</a> is displayed. Unless declared otherwise by the
+          developer, a user agent can use an icon for <a>any purpose</a>.
+        </p>
+        <p>
+          The <dfn>icon purposes</dfn> are as follows:
+        </p>
+        <dl>
+          <dt>
+            <dfn data-lt="badge purpose">badge</dfn>:
+          </dt>
+          <dd>
+            A user agent can present this icon where space constraints and/or
+            color requirements differ from those of the application icon.
+          </dd>
+          <dt>
+            <dfn data-lt="badge maskable">maskable</dfn>:
+          </dt>
+          <dd>
+            The image is designed with <a href="#icon-masks">icon masks and
+            safe zone</a> in mind, such that any part of the image that is
+            outside the <a>safe zone</a> can safely be ignored and masked away
+            by the user agent.
+          </dd>
+          <dt>
+            <dfn data-lt="any purpose">any</dfn>:
+          </dt>
+          <dd>
+            The user agent is free to display the icon in any context.
+          </dd>
+        </dl>
+        <p>
+          The steps for <dfn>processing the <code>purpose</code> member of an
+          image</dfn> are given by the following algorithm. The algorithm takes
+          an <a>ImageResource</a> <var>image</var>. This algorithm will return
+          a <a>set</a>.
+        </p>
+        <ol>
+          <li>Let <var>set</var> be an empty <a>set</a>.
+          </li>
+          <li>Let <var>value</var> be <var>image</var>["purpose"].
+          </li>
+          <li>If <a>Type</a>(<var>value</var>) is String:
+            <ol>
+              <li>Let <a>list</a> <var>keywords</var> be the result of
+              <a>splitting</a> <var>value</var> on spaces.
+              </li>
+              <li>
+                <a>For each</a> <var>keyword</var> of <var>keywords</var>:
+                <ol>
+                  <li>Set <var>keyword</var> to <var>keyword</var>,
+                  <a>lowercased</a>.
+                  </li>
+                  <li>If <var>keyword</var> is not one of the <a>icon
+                  purposes</a>, or <var>set</var> <a>contains</a>
+                  <var>keyword</var>, then <a>issue a developer warning</a> and
+                  <a>continue</a>.
+                  </li>
+                  <li>Otherwise, <a data-lt="set-append">append</a>
+                  <var>keyword</var> to <var>set</var>.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li>If <var>set</var> <a>is empty</a>, then <a data-lt="set-append">
+            append</a> <code>"any"</code> to <var>set</var>.
+          </li>
+          <li>Return <var>set</var>.
+          </li>
+        </ol>
+        <div class="example">
+          <p>
+            In the following example, the web application is listing two icons
+            to be used as a badge, one of which is specifically designed for
+            the Android platform.
+          </p>
+          <pre class="example json">
+            {
+              "name": "News",
+              "icons": [{
+                "platform": "android",
+                "purpose": "badge",
+                "sizes": "16x16",
+                "src": "icons/badges/android.png",
+                "type": "image/png"
+              }, {
+                "purpose": "badge",
+                "src": "icons/badges/safari.svg",
+                "type": "image/svg"
+              }]
+            }
+          </pre>
+        </div>
+      </section>
+      <section id="icon-masks">
+        <h2>
+          Icon masks and safe zone
+        </h2>
+        <p>
+          Some platforms have their own preferred icon shape, but as web
+          applications should work across multiple platforms, it is possible to
+          indicate that an icon can have a user-agent-specified mask applied by
+          adding the <a>maskable</a> purpose. This allows the platform to
+          ensure that the icon looks well integrated with the platform, and
+          even apply different masks and background colors in different places
+          throughout the platform.
+        </p>
+        <p>
+          The <dfn>safe zone</dfn> is the area within a <a>maskable</a> icon
+          which is guaranteed to always be visible, regardless of user agent
+          preferences. It is defined as a circle with center point in the
+          center of the icon and with a radius of 2/5 (40%) of the icon size,
+          which means the smaller of the icon width and height, in case the
+          icon is not square.
+        </p>
+        <p class="note">
+          Designers of <a>maskable</a> icons will want to make sure that all
+          important parts are within the <a>safe zone</a>.
+        </p>
+        <figure>
+          <img src="images/safe-zone.svg" width="340" height="340" alt=
+          "safe zone illustrated">
+          <figcaption>
+            The safe zone is a centrally positioned circle, with radius 2/5
+            (40%) of the minimum of the icon's width and height.
+          </figcaption>
+        </figure>
+        <p>
+          All pixels in this zone are guaranteed to be seen in all masks.
+          Pixels outside the safe zone are not guaranteed to (but can) be
+          visible depending on the applied mask.
+        </p>
+        <p>
+          The user agent MAY apply a mask of any size, making any pixels that
+          are more than 2/5ths of the image size (minimum of width and height
+          if non-square) away from the center (the <a>safe zone</a>)
+          transparent.
+        </p>
+        <p>
+          The user agent MUST NOT make any pixel within the safe zone
+          transparent.
+        </p>
+        <p>
+          The user agent MAY enlarge the icon by adding additional padding.
+        </p>
+        <p>
+          If the icon contains transparent pixels, the user agent MUST
+          composite the icon onto a solid color (eg. white) of the user agent's
+          choice.
+        </p>
+        <p class="note">
+          It is suggested that designers avoid using transparent pixels in
+          maskable icons.
+        </p>
+        <section>
+          <h3>
+            Examples of masks
+          </h3>
+          <p class="note">
+            By staying inside the <a>safe zone</a>, most icons will have around
+            10% padding on the top, bottom, right and left with no content or
+            non-essential content, such as an icon background. It is suggested
+            that developers check their icon when all but the safe zone is
+            masked out.
+          </p>
+          <h2 class="icon-title">
+            Icons with "maskable" purpose
+          </h2>
+          <div class="icons">
+            <div>
+              <img src="images/icon-plain.svg" alt=
+              "An icon over a checkerboard background">
+              <div class="icon-title">
+                Image
+              </div>
+              <div>
+                The base image with transparent background
+              </div>
+            </div>
+            <div>
+              <img src="images/icon-safe-zone.svg" alt=
+              "An icon in a purple circle (40% of the size) over a yellow background">
+              <div class="icon-title">
+                Safe zone
+              </div>
+              <div>
+                Circle with radius 2/5 (40%) of the icon size
+              </div>
+            </div>
+          </div>
+          <h2 class="icon-title">
+            Mask examples
+          </h2>
+          <div class="icons">
+            <div>
+              <img src="images/icon-mask-android-roundsquare.svg" alt=
+              "An icon inside a rounded yellow square on a purple background">
+              <div class="icon-title">
+                Rounded square
+              </div>
+              <div>
+                Android
+              </div>
+            </div>
+            <div>
+              <img src="images/icon-mask-android-squircle.svg" alt=
+              "An icon inside an extremely rounded yellow square on a purple background">
+              <div class="icon-title">
+                Squircle
+              </div>
+              <div>
+                Android
+              </div>
+            </div>
+            <div>
+              <img src="images/icon-mask-android-circle.svg" alt=
+              "An icon inside a rounded yellow circle on a purple background">
+              <div class="icon-title">
+                Circle
+              </div>
+              <div>
+                Android
+              </div>
+            </div>
+            <div>
+              <img src="images/icon-mask-ios.svg" alt=
+              "An icon inside a somewhat rounded yellow square on a purple background">
+              <div class="icon-title">
+                Rounded square
+              </div>
+              <div>
+                iOS
+              </div>
+            </div>
+            <div>
+              <img src="images/icon-mask-windows.svg" alt=
+              "An icon on a yellow background">
+              <div class="icon-title">
+                Fullbleed
+              </div>
+              <div>
+                Windows
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+      <section data-dfn-for="imageresource">
+        <h3>
+          <dfn>sizes</dfn> member
+        </h3>
+        <p>
+          The <a>sizes</a> member of an <a>ImageResource</a> is a <a>string</a>
+          consisting of an <a>unordered set of unique space-separated
+          tokens</a> which are <a>ASCII case-insensitive</a> that represents
+          the dimensions of an image. Each keyword is either an <a>ASCII
+          case-insensitive</a> match for the <a>string</a> "<a data-lt=
+          "any link size">any"</a>, or a value that consists of two <a>valid
+          non-negative integers</a> that do not have a leading U+0030 DIGIT
+          ZERO (0) character and that are separated by a single U+0078 LATIN
+          SMALL LETTER X or U+0058 LATIN CAPITAL LETTER X character. The
+          keywords represent icon sizes in raw pixels (as opposed to CSS
+          pixels). When multiple <a>ImageResource</a>s are available, a user
+          agent MAY use the value to decide which icon is most suitable for a
+          display context (and ignore any that are inappropriate).
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>sizes</code> member of an
+          image</dfn> are given by the following algorithm. The algorithm takes
+          an <a>ImageResource</a> <var>image</var>. This algorithm will return
+          a set.
+        </p>
+        <ol>
+          <li>Let <var>set</var> be an empty <a>set</a>.
+          </li>
+          <li>Let <var>value</var> be <var>image.sizes</var>.
+          </li>
+          <li>If <a>Type</a>(<var>value</var>) it not String, return
+          <code>undefined</code>.
+          </li>
+          <li>Otherwise, parse <var>value</var> as if it was a [[!HTML]] <code>
+            <a>sizes</a></code> attribute and let <a>list</a>
+            <var>keywords</var> be the result.
+          </li>
+          <li>
+            <a>For each</a> <var>keyword</var> of <var>keywords</var>:
+            <ol>
+              <li>
+                <a data-lt="set-append">Append</a> <var>keyword</var>,
+                <a>lowercased</a>, to <var>set</var>.
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>set</var>.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ImageResource" data-link-for="ImageResource">
+        <h3>
+          <dfn>src</dfn> member
+        </h3>
+        <p>
+          The <a>src</a> member of an <a>ImageResource</a> is a <a>URL</a> from
+          which a user agent can fetch the image's data.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>src</code> member of an
+          image</dfn> are given by the following algorithm. The algorithm takes
+          a <a>ImageResource</a> <var>icon</var>, and a <a>URL</a>
+          <var>manifest URL</var> , which is the <a>URL</a> from which the
+          <var>manifest</var> was fetched. This algorithm will return a
+          <a>URL</a> or <code>undefined</code>.
+        </p>
+        <ol>
+          <li>Let <var>value</var> be <var>image</var>["src"].
+          </li>
+          <li>If <a>Type</a>(<var>value</var>) it not String, return
+          <code>undefined</code>.
+          </li>
+          <li>Otherwise, <a>parse</a> <var>value</var> using <var>manifest
+          URL</var> as the base URL and return the result.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ImageResource">
+        <h3>
+          <dfn>type</dfn> member
+        </h3>
+        <p>
+          The <a>type</a> member of an <a>ImageResource</a> is a hint as to the
+          media type of the image. The purpose of this member is to allow a
+          user agent to ignore images of media types it does not support.
+        </p>
+        <p>
+          There is no default MIME type for image resources. However, for the
+          purposes of <a>determining the type of the resource</a>, user agents
+          must expect the resource to be an image.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>type</code> member of an
+          image</dfn> are given by the following algorithm. The algorithm takes
+          an <var>image</var> object as an argument, and returns either a
+          <a>string</a> or <code>undefined</code>.
+        </p>
+        <ol>
+          <li>Let <var>value</var> be <var>image</var>["<a>type</a>"].
+          </li>
+          <li>If <a>Type</a>(<var>value</var>) it not String, return
+          <code>undefined</code>.
+          </li>
+          <li>If <var>value</var> is not a <a>valid MIME type</a> or the value
+          of <var>type</var> is not a supported media format, issue a developer
+          warning and return <code>undefined</code>.
+          </li>
+          <li>Return <var>value</var>.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ImageResource" data-link-for="ImageResource">
+        <h3>
+          <dfn>platform</dfn> member
+        </h3>
+        <p>
+          The <a>platform</a> member represents the <a>platform</a> to which a
+          containing object applies.
+        </p>
+      </section>
+      <section>
+        <h3>
+          processing an array of image resources
+        </h3>
+        <p>
+          The steps for <dfn>processing <a>ImageResource</a> members</dfn> are
+          given by the following algorithm. The algorithm takes a manifest, a
+          <a>URL</a> <var>manifest URL</var>, which is the URL from which the
+          <var>manifest</var> was fetched, and a <a>string</a> that represents
+          the <var>member name</var> of the member which contains the array of
+          <a>ImageResource</a>s. This algorithm returns an
+          Array&lt;<a>ImageResource</a>&gt;
+        </p>
+        <ol>
+          <li>Let <var>imageResources</var> be a new Array object created as if
+          by the expression [].
+          </li>
+          <li>
+            <a>For each</a> <var>entry</var> of <var>manifest</var>[<var>member
+            name</var>]:
+          </li>
+          <li>
+            <ol>
+              <li>If <var>entry</var>["src"] is not <code>undefined</code>:
+                <ol>
+                  <li>Let <var>image</var> be a new object created as if by the
+                  expression ({}).
+                  </li>
+                  <li>Set <var>image</var>["src"] to the result of running <a>
+                    processing the <code>src</code> member of an image</a>
+                    given <var>entry</var> and <var>manifest URL</var>.
+                  </li>
+                  <li>Set <var>image</var>["type"] to the result of running <a>
+                    processing the <code>type</code> member of an image</a>
+                    given <var>entry</var> and <var>manifest URL</var>.
+                  </li>
+                  <li>Set <var>image</var>["sizes"] to the result of running
+                  <a>processing the <code>sizes</code> member of an image</a>
+                  given <var>entry</var> and <var>manifest URL</var>.
+                  </li>
+                  <li>Set <var>image</var>["purpose"] to the result of running
+                  <a>processing the <code>purpose</code> member of an image</a>
+                  given <var>entry</var> and <var>manifest URL</var>.
+                  </li>
+                  <li>
+                    <a data-lt="list-append">Append</a> <var>image</var> to
+                    <var>imageResources</var>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>imageResources</var>.
+          </li>
+        </ol>
+      </section>
+    </section>
+    <section>
+      <h2>
+        Multi-purpose members
+      </h2>
+      <p>
+        This section specifies members that can be used on multiple objects.
+        Each member specifies which object a multi-purpose member can be used
+        with.
+      </p>
+      <section data-dfn-for="ExternalApplicationResource" data-link-for=
+      "ExternalApplicationResource">
+        <h3>
+          <dfn>platform</dfn> member
+        </h3>
+        <p>
+          The <a>platform</a> member represents the <a>platform</a> to which a
+          containing object applies.
+        </p>
+        <p>
+          The following object types can make use of this member:
+        </p>
+        <ul>
+          <li>
+            <a>ExternalApplicationResource</a>
+          </li>
+          <li>
+            <a>ImageResource</a>
+          </li>
+        </ul>
+        <p>
+          A <a>platform</a> represents a software distribution ecosystem or
+          possibly an operating system.
+        </p>
+        <p class="note">
+          This specification does not define the particular values for a the
+          <a>platform</a> member. However, the working group maintains a
+          <a href="https://github.com/w3c/manifest/wiki/Platforms">list of
+          known platform values</a> in our wiki.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>
+        The ServiceWorkerRegistrationObject dictionary and its members
+      </h2>
+      <p>
+        A <dfn>ServiceWorkerRegistrationObject</dfn> dictionary represents a
+        service worker registration for the web application.
+      </p>
+      <pre class="idl">
+        dictionary ServiceWorkerRegistrationObject {
+          required USVString src;
+          USVString scope;
+          WorkerType type = "classic";
+          ServiceWorkerUpdateViaCache update_via_cache = "imports";
+        };
+      </pre>
+      <section data-dfn-for="ServiceWorkerRegistrationObject">
+        <h3>
+          <code>src</code> member
+        </h3>
+        <p>
+          The <dfn>src</dfn> member of a <a>ServiceWorkerRegistrationObject</a>
+          dictionary is a <a>URL</a> representing a service worker.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>src</code> member of a
+          service worker</dfn> are given by the following algorithm. The
+          algorithm takes a <a>USVString</a> <var>source URL</var>, and a
+          <a>URL</a> <var>manifest URL</var>, which is the <a>URL</a> from
+          which the <var>manifest</var> was fetched. This algorithm will return
+          a <a>URL</a> or <code>undefined</code>.
+        </p>
+        <ol>
+          <li>If <a>Type</a>(<var>source URL</var>) is not String or
+          <var>source URL</var> is the empty <a>string</a>, then return <code>
+            undefined</code>.
+          </li>
+          <li>Otherwise, <a>parse</a> <var>source URL</var> using <var>manifest
+          URL</var> as the base URL and return the result.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ServiceWorkerRegistrationObject" data-link-for=
+      "ServiceWorkerRegistrationObject">
+        <h3>
+          <dfn>scope</dfn> member
+        </h3>
+        <p>
+          The <a>scope</a> member of a <a>ServiceWorkerRegistrationObject</a>
+          dictionary is the service worker's associated <a>scope URL</a>.
+        </p>
+        <p>
+          The steps for <dfn>processing the <code>scope</code> member of a
+          service worker</dfn> are given by the following algorithm. The
+          algorithm takes a <a>USVString</a> <var>scope URL</var>, and a
+          <a>URL</a> <var>manifest URL</var>, which is the <a>URL</a> from
+          which the <var>manifest</var> was fetched. This algorithm will return
+          a <a>URL</a> or <code>undefined</code>.
+        </p>
+        <ol>
+          <li>If <var>scope URL</var> is <code>undefined</code>, return <code>
+            undefined</code>
+          </li>
+          <li>Otherwise, <a>parse</a> <var>scope URL</var> using <var>manifest
+          URL</var> as the base URL and return the result.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ServiceWorkerRegistrationObject">
+        <h3>
+          <code>type</code> member
+        </h3>
+        <p>
+          The <dfn>type</dfn> member of a
+          <a>ServiceWorkerRegistrationObject</a> dictionary is the service
+          worker's <a href=
+          "https://html.spec.whatwg.org/multipage/workers.html#workertype">worker
+          type</a>. The possible values are those of the <a>WorkerType</a> enum
+          defined in [[!HTML]].
+        </p>
+      </section>
+      <section data-dfn-for="ServiceWorkerRegistrationObject" data-link-for=
+      "ServiceWorkerRegistrationObject">
+        <h3>
+          <code>update_via_cache</code> member
+        </h3>
+        <p>
+          The <dfn>update_via_cache</dfn> member of a
+          <a>ServiceWorkerRegistrationObject</a> dictionary determines the
+          <a href=
+          "https://w3c.github.io/ServiceWorker/#dfn-update-via-cache">update
+          via cache mode</a> for the service worker. The possible values are
+          those of the <a>ServiceWorkerUpdateViaCache</a> enum defined in
+          [[!SERVICE-WORKERS-1]].
+        </p>
+      </section>
+    </section>
+    <section data-dfn-for="ExternalApplicationResource" data-link-for=
+    "ExternalApplicationResource">
+      <h2>
+        ExternalApplicationResource and its members
+      </h2>
+      <pre class="idl">
+        dictionary ExternalApplicationResource {
+          required USVString platform;
+          USVString url;
+          DOMString id;
+          USVString min_version;
+          sequence&lt;Fingerprint&gt; fingerprints;
+        };
+      </pre>
+      <p>
+        Each <dfn>ExternalApplicationResource</dfn>s represents an application
+        related to the web application. An application resource has the
+        following properties:
+      </p>
+      <dl>
+        <dt>
+          <code>platform</code>
+        </dt>
+        <dd>
+          the platform it is associated to.
+        </dd>
+        <dt>
+          <code>url</code>
+        </dt>
+        <dd>
+          the URL where the application can be found.
+        </dd>
+        <dt>
+          <code>id</code>
+        </dt>
+        <dd>
+          information additional to the URL or instead of the URL, depending on
+          the platform.
+        </dd>
+        <dt>
+          <code>min_version</code>
+        </dt>
+        <dd>
+          information about the minimum version of an application related to
+          this web app.
+        </dd>
+        <dt>
+          <code>fingerprints</code>
+        </dt>
+        <dd>
+          an array of <a>Fingerprint</a> objects used for verifying the
+          application.
+        </dd>
+      </dl>
+      <p>
+        A valid <a>ExternalApplicationResource</a> dictionary MUST have
+        <code>platform</code> and either an <code>url</code> or an
+        <code>id</code> (or both).
+      </p>
+      <div class="example">
+        <p>
+          In the following example, the web application is listing two
+          different related applications, one on Google Play Store and the
+          other one on the iTunes Store. The one on the Google Play Store has
+          an Android package name, a minimum version specifier, and
+          cryptographic fingerprints used for verification, in a
+          Play-Store-specific manner.
+        </p>
+        <pre class="example json">
+          {
+            "related_applications": [
+              {
+                "platform": "play",
+                "url": "https://play.google.com/store/apps/details?id=com.example.app1",
+                "id": "com.example.app1",
+                "min_version": "2",
+                "fingerprints": [
+                  {
+                    "type": "sha256_cert",
+                    "value": "92:5A:39:05:C5:B9:EA:BC:71:48:5F:F2"
+                  }
+                ]
+              },
+              {
+                "platform": "itunes",
+                "url": "https://itunes.apple.com/app/example-app1/id123456789"
+              }
+            ]
+          }
+        </pre>
+      </div>
+      <p class="issue">
+        Where should the <code>platform</code> expected value be listed?
+      </p>
+      <section data-dfn-for="ExternalApplicationResource">
+        <h3>
+          <code>url</code> member
+        </h3>
+        <p>
+          The <dfn>url</dfn> member of an <a>ExternalApplicationResource</a>
+          dictionary represents the <a>URL</a> at which the application can be
+          found.
+        </p>
+        <p>
+          The steps for <dfn>processing the <a>url</a> member of an
+          application</dfn> are given by the following algorithm. The algorithm
+          takes a <a>USVString</a> <var>application URL</var>. This algorithm
+          will return an <a>URL</a> or <code>undefined</code>.
+        </p>
+        <ol>
+          <li>If <var>application URL</var> is <code>undefined</code>, return
+          <code>undefined</code>.
+          </li>
+          <li>Otherwise, <a>parse</a> <var>application URL</var> and if the
+          result is not failure, return the result, otherwise return
+          <code>undefined</code>.
+          </li>
+        </ol>
+      </section>
+      <section data-dfn-for="ExternalApplicationResource">
+        <h3>
+          <code>id</code> member
+        </h3>
+        <p>
+          The <dfn>id</dfn> member of an <a>ExternalApplicationResource</a>
+          dictionary represents the id which is used to represent the
+          application on the platform.
+        </p>
+      </section>
+      <section data-dfn-for="ExternalApplicationResource">
+        <h3>
+          <code>min_version</code> member
+        </h3>
+        <p>
+          The <dfn>min_version</dfn> member of an
+          <a>ExternalApplicationResource</a> dictionary represents the minimum
+          version of the application that is considered related to this web
+          app. This version is a <a>string</a> with platform-specific syntax
+          and semantics.
+        </p>
+      </section>
+      <section data-dfn-for="Fingerprint">
+        <h3>
+          <code>fingerprints</code> member
+        </h3>
+        <pre class="idl">
+            dictionary Fingerprint {
+              USVString type;
+              USVString value;
+            };
+        </pre>
+        <p>
+          The <dfn data-dfn-for=
+          "ExternalApplicationResource">fingerprints</dfn> member of an
+          <a>ExternalApplicationResource</a> dictionary represents an array of
+          <a>Fingerprint</a>s.
+        </p>
+        <p>
+          Each <dfn>Fingerprint</dfn>s represents a set of cryptographic
+          fingerprints used for verifying the application. A fingerprint has
+          the following two properties: <dfn>type</dfn> and <dfn>value</dfn>.
+          Each of these are <a>string</a>s, but their syntax and semantics are
+          platform-defined.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>
+        IANA considerations
+      </h2>
+      <p>
+        The following registrations are for community review and will be
+        submitted to the <a href="https://www.ietf.org/iesg/">IESG</a> for
+        review, approval, and registration with <a href=
+        "https://www.iana.org/">IANA</a>.
+      </p>
+      <section>
+        <h3>
+          Media type registration
+        </h3>
+        <p>
+          This section contains the required text for MIME media type
+          registration with <a href="https://www.iana.org/">IANA</a>.
+        </p>
+        <p>
+          The <dfn>media type for a manifest</dfn> is
+          <code>application/manifest+json</code>.
+        </p>
+        <p>
+          If the protocol over which the manifest is transferred supports the
+          [[!MIME-TYPES]] specification (e.g. HTTP), it is RECOMMENDED that the
+          manifest be labeled with the <a>media type for a manifest</a>.
+        </p>
+        <dl>
+          <dt>
+            Type name:
+          </dt>
+          <dd>
+            application
+          </dd>
+          <dt>
+            Subtype name:
+          </dt>
+          <dd>
+            manifest+json
+          </dd>
+          <dt>
+            Required parameters:
+          </dt>
+          <dd>
+            N/A
+          </dd>
+          <dt>
+            Optional parameters:
+          </dt>
+          <dd>
+            N/A
+          </dd>
+          <dt>
+            Encoding considerations:
+          </dt>
+          <dd>
+            Same as for application/json
+          </dd>
+          <dt>
+            Security and privacy considerations:
+          </dt>
+          <dd>
+            <p>
+              This specification does not directly deal with high-value data.
+              However, <a>installed</a> web applications and their data could
+              be seen as "high value" (particularly from a privacy
+              perspective).
+            </p>
+            <p>
+              As the manifest format is JSON and will commonly be encoded using
+              [[!UNICODE]], the security considerations described in
+              [[!ECMA-404]] and [[!UNICODE-SECURITY]] apply. In addition,
+              because there is no way to prevent developers from including
+              custom/unrestrained data in a <a>manifest</a>, implementors need
+              to impose their own implementation-specific limits on the values
+              of otherwise unconstrained member types, e.g. to prevent denial
+              of service attacks, to guard against running out of memory, or to
+              work around platform-specific limitations.
+            </p>
+            <p>
+              Web applications will generally contain ECMAScript, HTML, CSS
+              files, and other media, which are executed in a sand-boxed
+              environment. As such, implementors need to be aware of the
+              security implications for the types they support. Specifically,
+              implementors need to consider the security implications outlined
+              in at least the following specifications: [[!CSS-MIME]],
+              [[!ECMAScript-MIME]], [[!HTML]].
+            </p>
+            <p>
+              As web applications can contain content that is able to
+              simultaneously interact with the local device and a remote host,
+              implementors need to consider the privacy implications resulting
+              from exposing private information to a remote host. Mitigation
+              and in-depth defensive measures are an implementation
+              responsibility and not prescribed by this specification. However,
+              in designing these measures, implementors are advised to enable
+              user awareness of information sharing, and to provide easy access
+              to interfaces that enable revocation of permissions.
+            </p>
+            <p>
+              As this specification allows for the declaration of URLs within
+              certain members of a manifest, implementors need to consider the
+              security considerations discussed in the [[!URL]] specification.
+              Implementations intending to display <abbr title=
+              "Internationalized Resource Identifiers">IRIs</abbr> and
+              <abbr title="Internationalized domain name">IDNA</abbr> addresses
+              found in the manifest are strongly encouraged to follow the
+              security advice given in [[!UNICODE-SECURITY]].
+            </p>
+            <p>
+              Developers need to be aware of the security considerations
+              discussed throughout the [[!CSP3]] specification, particularly in
+              relation to making <code>data:</code> a valid source for the
+              purpose of <q>inlining</q> a manifest. Doing so can enable XSS
+              attacks by allowing a manifest to be included directly in the
+              document itself; this is best avoided completely.
+            </p>
+          </dd>
+          <dt>
+            Applications that use this media type:
+          </dt>
+          <dd>
+            Web browsers
+          </dd>
+          <dt>
+            Additional information:
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                Magic number(s):
+              </dt>
+              <dd>
+                N/A
+              </dd>
+              <dt>
+                File extension(s):
+              </dt>
+              <dd>
+                .webmanifest
+              </dd>
+              <dt>
+                Macintosh file type code(s):
+              </dt>
+              <dd>
+                TEXT
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            Person & email address to contact for further information:
+          </dt>
+          <dd>
+            The <a href="https://www.w3.org/WebPlatform/WG/" rel="nofollow">Web
+            Platform Working Group</a> can be contacted at <a href=
+            "https://lists.w3.org/Archives/Public/public-webapps/" rel=
+            "nofollow">public-webapps@w3.org</a>.
+          </dd>
+          <dt>
+            Intended usage:
+          </dt>
+          <dd>
+            COMMON
+          </dd>
+          <dt>
+            Restrictions on usage:
+          </dt>
+          <dd>
+            none
+          </dd>
+          <dt>
+            Author:
+          </dt>
+          <dd>
+            W3C's Web Platform Working Group.
+          </dd>
+          <dt>
+            Change controller:
+          </dt>
+          <dd>
+            W3C.
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h3>
+          Link relation type registration
+        </h3>
+        <p class="note">
+          A request to register the <code>manifest</code> link relation type
+          been submitted to IANA.
+        </p>
+        <dl>
+          <dt>
+            Relation Name:
+          </dt>
+          <dd>
+            manifest
+          </dd>
+          <dt>
+            Description:
+          </dt>
+          <dd>
+            Links to a <a>manifest</a>. A manifest provides developers with a
+            centralized place to put metadata associated with a web
+            application.
+          </dd>
+          <dt>
+            Reference:
+          </dt>
+          <dd>
+            <a href=
+            "https://www.w3.org/TR/appmanifest/">https://www.w3.org/TR/appmanifest/</a>
+          </dd>
+          <dt>
+            Notes:
+          </dt>
+          <dd>
+            Please refer to the steps for <a>obtaining a manifest</a> for
+            details about how to fetch and <a>apply</a> a <a>manifest</a>.
+          </dd>
+        </dl>
+      </section>
+    </section>
+    <section class="appendix">
+      <h2>
+        Acknowledgements
+      </h2>
+      <p>
+        This document reuses text from the [[HTML]] specification, as permitted
+        by the license of that specification.
+      </p>
+      <p>
+        Dave Raggett and Dominique Hazael-Massieux contributed to this
+        specification via the HTML5Apps project.
+      </p>
+      <p>
+        Claudio Gomboli for icon example images.
+      </p>
+    </section>
+    <section id="conformance" data-status="done" class="appendix">
+      <p>
+        There is only one class of product that can claim conformance to this
+        specification: a <dfn>user agent</dfn>.
+      </p>
+      <p class="note">
+        Although this specification is primarily targeted at web browsers, it
+        is feasible that other software could also implement this specification
+        in a conforming manner. For instance, search engines, or crawlers,
+        could find and process manifests to build up catalogs of sites that
+        potentially work as installable web applications.
+      </p>
+      <section class="informative">
+        <h3>
+          Extensibility
+        </h3>
+        <p>
+          This specification is designed to be extensible. Other specifications
+          are encouraged to define new members for the manifest. However, in
+          doing so, please follow the conventions used in this specification.
+          In particular, use the <a>extension point</a> to hook into the steps
+          for <a>processing a manifest</a>. Also, be sure to specify the steps
+          for processing your particular member in the manner set forth in this
+          specification. This will help keep this part of the platform
+          consistent.
+        </p>
+        <p>
+          To allow the community can easily find extensions, please add your
+          extensions to the <a href=
+          "https://github.com/w3c/manifest/wiki/Extensions-Registry">Extensions
+          Registry</a>.
+        </p>
+        <p>
+          When specifying a new member, don't override or <a href=
+          "https://annevankesteren.nl/2014/02/monkey-patch">monkey patch</a>
+          anything defined in this specification. Also, don't assume your
+          member will be processed before or after any other member. Keep your
+          new member, and its processing, atomic and self contained. Note also
+          that implementations are free to ignore any member they do not
+          recognize or support.
+        </p>
+        <p>
+          If you are writing a specification and temporarily want to patch this
+          specification to help implementations along, <a href=
+          "https://github.com/w3c/manifest/issues">file a bug</a> so the
+          community is informed of what you are trying to do.
+        </p>
+        <section id="proprietary-extensions" class="informative">
+          <h3>
+            Proprietary manifest members
+          </h3>
+          <p>
+            Although proprietary extensions are undesirable, they can't
+            realistically be avoided. As such, the RECOMMENDED way to add a new
+            proprietary manifest member as an extension is to use a vendor
+            prefix.
+          </p>
+          <p>
+            We encourage implementors to add proprietary extensions to our
+            <a href=
+            "https://github.com/w3c/manifest/wiki/Extensions-Registry">Extensions
+            Registry</a>. This allows the community to track what extensions
+            vendors and/or the web community have defined and documented.
+            Periodically, we will consider those extensions for
+            standardization.
+          </p>
+          <p>
+            The following is an example of three hypothetical vendor
+            extensions.
+          </p>
+          <pre class="example json" title="vendor extensions">
+            {
+              ...
+              "webkit_fancy_feature": "some/url/img",
+              "moz_awesome_thing": { ... },
+              "vendor_example_site_verification": "KEY_9864D0966935"
+              ...
+            }
+          </pre>
+        </section>
+      </section>
+    </section>
+    <section class="appendix">
+      <h2>
+        Relationship to HTML's <code>link</code> and <code>meta</code> elements
+      </h2>
+      <p>
+        An extensive discussion of why we chose to use JSON instead of HTML
+        <code>meta</code>/<code>link</code> tags for this specification is
+        available on <a href=
+        "https://github.com/w3c/manifest/issues/97">GitHub</a> and on the
+        <a href=
+        "https://lists.w3.org/Archives/Public/www-tag/2014Jan/0139.html">www-tag</a>
+        list. Below is a short summary of the key points raised in those
+        discussions.
+      </p>
+      <p>
+        The document format defined in this specification provides a unified
+        means of encapsulating metadata about a Web application in a way that
+        we hope will avoid existing pitfalls with both proprietary and
+        [[!HTML]]'s <code>meta</code>/<code>link</code> tags. Those pitfalls
+        include:
+      </p>
+      <ul>
+        <li>Developers have to duplicate the icons and application name in each
+        page of a web site, leading to significant redundancy across pages.
+        This is compounded if that information never gets used by the user
+        agent (e.g., the user never bookmarks the web application).
+        </li>
+        <li>Spreading metadata across multiple documents can cause data to fall
+        out of sync.
+        </li>
+        <li>If the metadata for a web application lives in a HTML document,
+        that significantly increases the cost to user agents (and users) of
+        checking for updates to the metadata of a site. Since the HTML file is
+        likely to change often, it means that a user agent will often have to
+        download the whole HTML file in order to check if any of the relevant
+        meta tags have changed. If this resource contains inlined resources
+        like JavaScript, images, or stylesheets, this could be a non-trivial
+        download.
+        </li>
+      </ul>
+      <p>
+        Although it would be unrealistic to think that this specification won't
+        bring its own set of problems, externalizing this data in the form of a
+        manifest solves the problems described above. These problems are solved
+        by:
+      </p>
+      <ul>
+        <li>Making the manifest externally linkable: External manifest files
+        can be cached as external resources, saving both bytes and redundancy
+        in the markup.
+        </li>
+        <li>Flexible value types: unlike HTML attributes, members of the
+        manifest can represent data using complex types, such as objects and
+        arrays, rather than just strings. This solves the problem of the
+        awkward and highly inconsistent formats the values of proprietary
+        <code>meta</code> tags are currently using, especially when a tag's
+        value contains several sub-values.
+        </li>
+      </ul>
+      <p>
+        In addition, standardizing the functionality currently provided by the
+        various <code>meta</code> tag-based solutions within the manifest
+        solves the problem of having to declare large number of proprietary and
+        standard [[!HTML]] tags that all achieve the same thing. Of course,
+        this hinges on the standard actually getting implemented by browsers
+        and those browsers getting widely deployed to users: if this happens,
+        the Web community might be able to retire many of the proprietary
+        <code>meta</code> tags plaguing the Web at the time of writing. More
+        information about the proprietary tags can be found in the
+        <cite><a href="https://w3c-webmob.github.io/installable-webapps/">Use
+        Cases and Requirements for Installable Web Apps</a></cite> .
+      </p>
+      <p>
+        Lastly, this specification does not make the standardized solutions
+        found in [[!HTML]] redundant. When members like the <code>name</code>
+        or <code>icons</code> is missing from the manifest, user agents can
+        search in a manifest's owner [[!HTML]] document for things like icons
+        and the application name (or a user agent might even fallback to
+        proprietary tags/metadata, if they are present in a document).
+      </p>
+    </section>
+    <section class="appendix">
+      <h2>
+        JSON Schema
+      </h2>
+      <p>
+        Developers interested in validating <a>manifest</a> documents can find
+        an unofficial <a href="http://json.schemastore.org/web-manifest">JSON
+        schema for the manifest format</a> at <a href=
+        "http://schemastore.org/">schemastore.org</a>. It is licensed under
+        <a href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache
+        2.0</a>. It is kindly maintained by <a href=
+        "https://github.com/madskristensen">Mads Kristensen</a>. If you find
+        any issues with the JSON schema, please <a href=
+        "https://github.com/SchemaStore/schemastore/issues/">file a bug</a> at
+        the <a href="https://github.com/SchemaStore/schemastore">SchemaStore
+        repository</a> on GitHub.
+      </p>
+    </section>
+    <section id="internationalization" class="appendix">
+      <h2>
+        Internationalization
+      </h2>
+      <p>
+        It is expected that authors will localize the content of a manifest by
+        using one of the following options:
+      </p>
+      <dl>
+        <dt>
+          Dynamically setting the language:
+        </dt>
+        <dd>
+          This can include, for instance, asking the end-user what their
+          preferred language is and dynamically adding or replacing the
+          manifest link relationship to the document based on that language
+          preference (e.g., using a URL like "manifest.php?lang=fr").
+        </dd>
+        <dt>
+          Using content-negotiation, or geotargeting, etc. on the server:
+        </dt>
+        <dd>
+          The server that hosts the web application could attempt to
+          predetermine the end-user's language by using <a href=
+          "https://en.wikipedia.org/wiki/Geotargeting">geotargeting</a> or by
+          using content negotiation (e.g., using [[RFC7540]]'s
+          "<code>Accept-Language</code>" header, or even a custom HTTP header).
+        </dd>
+      </dl>
+      <p>
+        Given the options above, developers need to be mindful of the
+        end-user's privacy with respect to their preferred language: When the
+        end-user has explicitly indicated their language preference to a web
+        application (i.e., when not just using the user-agent default language
+        settings), sending the end-user's preferred language in the clear over
+        the wire is generally not OK. Doing so would reveal personal
+        information about an end-user. As such, developers are encouraged to
+        use [[TLS]] to reduce the chances of pervasive monitoring of their Web
+        applications [[RFC7258]].
+      </p>
+    </section>
+    <section>
+      <h2>
+        Use Cases and Requirements
+      </h2>
+      <p>
+        This document attempts to address the <cite><a href=
+        "https://w3c-webmob.github.io/installable-webapps/">Use Cases and
+        Requirements for Installable Web Apps</a></cite>.
+      </p>
+    </section>
+    <section id="issue-summary"></section>
+    <section id="idl-index" class="appendix">
+      <!-- All the Web IDL will magically appear here -->
+    </section>
+    <section class="appendix">
+      <h3>
+        Terms defined by reference
+      </h3>
+      <p>
+        As the manifest uses the JSON format, this specification relies on the
+        types defined in [[!ECMA-404]] specification: namely <dfn>object</dfn>,
+        <dfn>array</dfn>, <dfn>number</dfn>, <dfn>string</dfn>,
+        <code>true</code>, <code>false</code>, and <code>undefined</code>.
+        Strict type checking is not enforced by this specification. Instead,
+        each member's definition specifies the steps required to process a
+        particular member and what to do when a type does not match what is
+        expected.
+      </p>
+      <ul class="index" data-sort="">
+        <li>[[!URL]] defines the following terms:
+          <ul>
+            <li>
+              <dfn><a data-cite="!URL#concept-url">URL</a></dfn>
+            </li>
+            <li>
+              <dfn data-lt="parse|parsing|URL parsing"><a data-cite=
+              "!URL#concept-url-parser">URL parser</a></dfn>
+            </li>
+          </ul>
+        </li>
+        <li>[[!SCREEN-ORIENTATION]] defines the following terms:
+          <ul>
+            <li>
+              <dfn data-cite=
+              "!SCREEN-ORIENTATION#dfn-default-orientation">default
+              orientation</dfn>
+            </li>
+            <li>
+              <dfn data-cite=
+              "!SCREEN-ORIENTATION#dom-orientationlocktype">OrientationLockType</dfn>
+            </li>
+          </ul>
+        </li>
+        <li>[[!CSS-SYNTAX-3]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite="CSS-SYNTAX-3#parse-component-value"><dfn>parse a
+              component value</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!CSP3]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite=
+              "!CSP3#directive-manifest-src"><dfn>manifest-src</dfn>
+              directive</a>
+            </li>
+            <li>
+              <a data-cite="!CSP3#directive-img-src"><dfn>img-src</dfn>
+              directive</a>
+            </li>
+            <li>
+              <a data-cite="!CSP3#directive-default-src"><dfn>default-src</dfn>
+              directive</a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!SECURE-CONTEXTS]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite="!SECURE-CONTEXTS#is-origin-trustworthy"><dfn>Is
+              origin potentially trustworthy</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!SERVICE-WORKERS-1]] defines the following terms:
+          <ul>
+            <li>
+              <a href=
+              "https://w3c.github.io/ServiceWorker/#start-register-algorithm"><dfn>
+              Start Register</dfn></a>
+            </li>
+            <li>
+              <a href=
+              "https://w3c.github.io/ServiceWorker/#dfn-scope-url"><dfn>scope
+              URL</dfn></a>
+            </li>
+            <li>
+              <a href=
+              "https://w3c.github.io/ServiceWorker/#dfn-update-via-cache"><dfn>ServiceWorkerUpdateViaCache</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!ECMA-402]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite=
+              "!ECMA-402#sec-isstructurallyvalidlanguagetag"><dfn>IsStructurallyValidLanguageTag</dfn></a>
+            </li>
+            <li>
+              <a data-cite=
+              "!ECMA-402#sec-canonicalizelanguagetag"><dfn>CanonicalizeLanguageTag</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!WEBIDL]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite=
+              "!WEBIDL#invalidstateerror"><dfn>InvalidStateError</dfn></a>
+            </li>
+            <li>
+              <a data-cite=
+              "!WEBIDL#notallowederror"><dfn>NotAllowedError</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!WEBIDL#es-dictionary"><dfn data-lt=
+              "to idl dictionary value">converted to IDL dictionary
+              value</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!DOM]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite="!DOM#event"><dfn><code>Event</code>
+              interface</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!DOM#concept-event-fire"><dfn data-lt=
+              "fire|fired|firing">Fire an event</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!FETCH]] defines the following terms:
+          <ul data-sort="">
+            <li>
+              <dfn data-cite="!FETCH#concept-fetch">Fetch</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!FETCH#concept-response">Response</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!FETCH#concept-request">Request</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!FETCH#concept-network-error">Network error</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!FETCH#concept-request-context">Context</dfn>
+            </li>
+          </ul>
+        </li>
+        <li>[[!HTML]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite=
+              "HTML/parsing.html#completely-loaded"><dfn>completely
+              loaded</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#allowed-to-navigate"><dfn>allowed to
+              navigate</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#external-resource-link"><dfn data-lt=
+              "External Resource">external Resource link</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#top-level-browsing-context"><dfn>top-level
+              browsing context</dfn></a>
+            </li>
+            <li>
+              <dfn data-cite="!HTML#concept-origin-opaque">opaque origin</dfn>
+            </li>
+            <li>
+              <a data-cite="!HTML#same-origin"><dfn>same-origin</dfn></a>
+            </li>
+            <li>
+              <a data-cite=
+              "!HTML#unordered-set-of-unique-space-separated-tokens"><dfn>unordered
+              set of unique space-separated tokens</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#navigate"><dfn data-lt=
+              "navigated|navigate|navigation">navigate algorithm</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#replacement-enabled"><dfn>replacement
+              enabled</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-link-element"><dfn data-lt=
+              "link"><code>link</code> element</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#linkTypes"><dfn>link type</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#attr-link-media"><dfn>media</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#delay-the-load-event"><dfn>delay the load
+              event</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#tree-order"><dfn>tree order</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#attr-link-rel"><dfn><code>rel</code>
+              attribute</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#concept-link-obtain"><dfn>obtain a
+              resource</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#networking-task-source"><dfn>networking task
+              source</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#queue-a-task"><dfn>queue a task</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#origin"><dfn>origin</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-a-element"><dfn data-lt=
+              "a"><code>a</code> element</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-meta-element"><dfn data-lt=
+              "meta"><code>meta</code> element</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-area-element"><dfn data-lt=
+              "area"><code>area</code> element</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#attr-meta-name"><dfn><code>name</code>
+              attribute</dfn></a>
+            </li>
+            <li>
+              <a data-cite=
+              "!HTML#meta-application-name"><dfn>application-name</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-title-element"><dfn><code>title</code>
+              element</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#rel-icon"><dfn>icon link type</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#ascii-case-insensitive"><dfn>ASCII
+              case-insensitive</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#attr-link-sizes-any"><dfn>any link
+              size</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#valid-non-negative-integer"><dfn>valid
+              non-negative integer</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#attr-link-sizes"><dfn>sizes</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#concept-link-type-sniffing"><dfn>determining
+              the type of the resource</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#valid-mime-type"><dfn>valid MIME
+              type</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#same-origin"><dfn>same origin</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#the-element's-base-url"><dfn>the element's
+              base URL</dfn></a>.
+            </li>
+            <li>
+              <a data-cite="!HTML#queue-a-post-load-task"><dfn>queue a
+              post-load task</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#event-handler-idl-attributes"><dfn data-lt=
+              "event handler attributes">Event handler IDL attribute</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#in-parallel"><dfn>in parallel</dfn></a>
+            </li>
+            <li>
+              <a data-cite="!HTML#workertype"><dfn>WorkerType</dfn></a>
+            </li>
+          </ul>
+        </li>
+        <li>[[!INFRA]] defines the following terms:
+          <ul>
+            <li>
+              <dfn data-cite="!INFRA#ascii-lowercase" data-lt=
+              "lowercased">ASCII lowercase</dfn>
+            </li>
+            <li>
+              <dfn data-cite=
+              "!INFRA#strip-leading-and-trailing-ascii-whitespace" data-lt=
+              "trim">strip leading and trailing ASCII whitespace</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA/#split-on-ascii-whitespace" data-lt=
+              "splitting">split a string input on ASCII whitespace</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#list">list</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#ordered-set">set</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#set-replace">replace</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#list-iterate">for each</dfn> (for list)
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#iteration-continue">continue</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#list-contain">contains</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#list-is-empty">is empty</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#list-append" data-lt="list-append">append
+              (for list)</dfn>
+            </li>
+            <li>
+              <dfn data-cite="!INFRA#set-append" data-lt="set-append">append
+              (for set)</dfn>
+            </li>
+          </ul>
+        </li>
+        <li>[[!ENCODING]] defines the following terms:
+          <ul>
+            <li>
+              <dfn data-cite="!ENCODING#utf-8-decode" data-lt=
+              "utf-8 decoding">UTF-8 decode</dfn>
+            </li>
+          </ul>
+        </li>
+        <li>[[!ECMASCRIPT]] defines the following terms:
+          <ul>
+            <li>
+              <a data-cite=
+              "!ECMASCRIPT#sec-ecmascript-data-types-and-values"><dfn>Type</dfn>(<var>x</var>)</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </section><!-- All references will appear here -->
+  </body>
+</html>

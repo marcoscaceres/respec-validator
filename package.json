@@ -1,0 +1,28 @@
+{
+  "name": "respec-validator",
+  "version": "1.0.0",
+  "description": "Validates ReSpec documents in various ways.",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "w3c",
+    "respec",
+    "standards",
+    "validator"
+  ],
+  "author": "Marcos Cáceres",
+  "license": "CC0-1.0",
+  "bin": {
+    "respec-validate": "cli.js"
+  },
+  "dependencies": {
+    "command-line-args": "^5.0.2",
+    "command-line-usage": "^5.0.5",
+    "link-checker": "^1.0.0-rc.12",
+    "respec": "^23.6.0",
+    "serve": "^10.1.1",
+    "vnu-jar": "^18.11.5"
+  }
+}
