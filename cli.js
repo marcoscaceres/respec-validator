@@ -4,7 +4,7 @@
 const path = require("path");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
-
+let DEBUG = false;
 const optionList = [
   {
     alias: "l",
@@ -143,6 +143,7 @@ async function doReSpecValidation(spec, params) {
   const cmd = `npx respec2html -e -w --timeout 30 --src="${
     url.href
   }" --out ${tempFile}`;
+  if (DEBUG) console.log("Using URL:", url.href);
   await new ShellCommand(cmd).run();
   console.info(
     "    ✅  Success! ReSpec document has not warnings or errors...\n"
@@ -195,7 +196,7 @@ async function validate(options) {
     }
     console.info("🎉 All checks passed!");
   } catch (err) {
-    if (options.debug) console.error(err);
+    if (DEBUG) console.error(err);
     console.info("\n ❌  Not so good... please fix the issues above.");
     exitCode = 1;
   } finally {
@@ -211,6 +212,7 @@ async function parseCommandLine() {
     console.info(commandLineUsage(usageSections));
     return process.exit(127);
   }
+  DEBUG = options.debug;
   if (options.version) {
     const fs = require("fs");
     const { promisify } = require("util");
