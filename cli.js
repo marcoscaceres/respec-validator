@@ -32,6 +32,12 @@ const optionList = [
     type: Boolean,
   },
   {
+    defaultValue: false,
+    description: "Show version number.",
+    name: "version",
+    type: Boolean,
+  },
+  {
     description: "Override the spec's status.",
     name: "status",
     type: String,
@@ -44,7 +50,6 @@ const optionList = [
   },
   {
     defaultOption: true,
-    defaultValue: "index.html",
     description: "A ReSpec src file.",
     multiple: false,
     name: "src",
@@ -54,8 +59,12 @@ const optionList = [
 
 const usageSections = [
   {
-    header: "validate",
+    header: "respec-validator",
     content: "A tool that helps validates a ReSpec document for publication.",
+  },
+  {
+    header: "Usage",
+    content: "npx respec-validator [options] file.html",
   },
   {
     header: "Options",
@@ -154,13 +163,13 @@ async function doMarkupValidation(file) {
 }
 
 async function checkLinks(file) {
-  console.info("🔎 Checking links and cross-references...\n");
+  console.info("🔎 Checking links and cross-references...");
   const dir = path.dirname(file);
   // the link checker expects a directory, not a file.
   await new ShellCommand(
     `npx link-checker --http-timeout=20000 --http-redirects=3 ${dir}`
   ).run();
-  console.info("    ✅  Links are good!\n");
+  console.info("\n    ✅  Links are good!\n");
 }
 
 /**
@@ -194,7 +203,7 @@ async function validate(options) {
   }
 }
 
-function parseCommandLine() {
+async function parseCommandLine() {
   let options;
   try {
     options = commandLineArgs(optionList);
@@ -202,12 +211,27 @@ function parseCommandLine() {
     console.info(commandLineUsage(usageSections));
     return process.exit(127);
   }
+  if (options.version) {
+    const fs = require("fs");
+    const { promisify } = require("util");
+    const readFileAsync = promisify(fs.readFile);
+    const packagePath = path.resolve(__dirname, "./package.json");
+    const content = await readFileAsync(packagePath, "utf-8");
+    const { version } = JSON.parse(content);
+    console.info(version + "\n");
+    return process.exit(0)
+  }
   if (options.help) {
     console.info(commandLineUsage(usageSections));
     return process.exit(0);
   }
+  if (!options.src) {
+    console.info(commandLineUsage(usageSections));
+    return process.exit(1);
+  }
   return options;
 }
-
-const options = parseCommandLine();
-if (options) validate(options);
+(async () => {
+  const options = await parseCommandLine();
+  if (options) validate(options);
+})();
