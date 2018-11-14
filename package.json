@@ -24,5 +24,14 @@
     "respec": "^23.6.0",
     "serve": "^10.1.1",
     "vnu-jar": "^18.11.5"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcoscaceres/respec-validator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marcoscaceres/respec-validator/issues"
+  },
+  "homepage": "https://github.com/marcoscaceres/respec-validator#readme"
 }
