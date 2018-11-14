@@ -49,6 +49,11 @@ const optionList = [
     type: String,
   },
   {
+    description: "A GitHub user associated with the token. Must also pass --gh-user.",
+    name: "gh-user",
+    type: String,
+  },
+  {
     defaultOption: true,
     description: "A ReSpec src file.",
     multiple: false,
@@ -184,6 +189,9 @@ async function validate(options) {
     if (options["gh-token"])
       Object.assign(params, { githubToken: options["gh-token"] });
 
+    if (options["gh-token"])
+      Object.assign(params, { githubUser: options["gh-user"] });
+
     if (options["status"])
       Object.assign(params, { specStatus: options["status"] });
 
@@ -221,7 +229,7 @@ async function parseCommandLine() {
     const content = await readFileAsync(packagePath, "utf-8");
     const { version } = JSON.parse(content);
     console.info(version + "\n");
-    return process.exit(0)
+    return process.exit(0);
   }
   if (options.help) {
     console.info(commandLineUsage(usageSections));
@@ -230,6 +238,14 @@ async function parseCommandLine() {
   if (!options.src) {
     console.info(commandLineUsage(usageSections));
     return process.exit(1);
+  }
+  if (options["gh-token"] && !options["gh-user"]) {
+    console.error("Missing --gh-user value.");
+    process.exit(1);
+  }
+  if (!options["gh-token"] && options["gh-user"]) {
+    console.error("Missing --gh-token value.");
+    process.exit(1);
   }
   return options;
 }
