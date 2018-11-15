@@ -50,7 +50,7 @@ const optionList = [
   },
   {
     description:
-      "A GitHub user associated with the token. Must also pass --gh-user.",
+      "A GitHub user associated with the token.",
     name: "gh-user",
     type: String,
   },
@@ -191,7 +191,7 @@ async function validate(options) {
     if (options["gh-token"])
       Object.assign(params, { githubToken: options["gh-token"] });
 
-    if (options["gh-token"])
+    if (options["gh-user"])
       Object.assign(params, { githubUser: options["gh-user"] });
 
     if (options["status"])
@@ -245,10 +245,6 @@ async function parseCommandLine() {
   if (!options.src) {
     console.info(commandLineUsage(usageSections));
     return process.exit(1);
-  }
-  if (options["gh-token"] && !options["gh-user"]) {
-    console.error("Missing --gh-user value.");
-    process.exit(1);
   }
   if (!options["gh-token"] && options["gh-user"]) {
     console.error("Missing --gh-token value.");
