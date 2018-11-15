@@ -4,7 +4,7 @@
 const path = require("path");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
-let DEBUG = false;
+let DEBUG = process.env.DEBUG || false;
 const optionList = [
   {
     alias: "l",
@@ -110,6 +110,7 @@ class ShellCommand {
   run() {
     const { exec } = require("child_process");
     return new Promise((resolve, reject) => {
+      if (DEBUG) console.log(`Running Shell command:\n\t${this.cmd}\n`);
       const childProcess = exec(this.cmd, (err, data) => {
         if (err) {
           return reject(err);
@@ -146,10 +147,9 @@ async function doReSpecValidation(spec, params) {
     url.searchParams.append(key, value);
   }
   // -e is stop on errors, -w is stop on warnings
-  const cmd = `npx respec2html -e -w --timeout 30 --src="${
+  const cmd = `npx respec2html -e -w --timeout 30 --src "${
     url.href
   }" --out ${tempFile}`;
-  if (DEBUG) console.log("Using URL:", url.href);
   await new ShellCommand(cmd).run();
   console.info(
     "    ✅  Success! ReSpec document has not warnings or errors...\n"
