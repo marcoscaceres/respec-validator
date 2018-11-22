@@ -1,5 +1,9 @@
 # respec-validator
-A tool that helps validates a ReSpec document for publication.
+A tool that helps validates a ReSpec document for publication. It:
+
+ * Checks that there are not ReSpec warnings or errors.
+ * Generated output conforms to validator.nu.
+ * There are not broken links/cross-references to other documents.
 
 ## Installation
 
