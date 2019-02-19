@@ -15,7 +15,8 @@
   "author": "Marcos Cáceres",
   "license": "CC0-1.0",
   "bin": {
-    "respec-validate": "cli.js"
+    "respec-validate": "cli.js",
+    "respec-validator": "cli.js"
   },
   "dependencies": {
     "command-line-args": "^5.0.2",
