@@ -22,7 +22,7 @@
     "command-line-args": "^5.1.1",
     "command-line-usage": "^5.0.5",
     "link-checker": "^1.2.1",
-    "respec": "^24.10.2",
+    "respec": "latest",
     "serve": "^11.0.0",
     "vnu-jar": "^18.11.5"
   },
