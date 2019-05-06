@@ -13,6 +13,13 @@ const optionList = [
     type: Boolean,
   },
   {
+    alias: "g",
+    defaultValue: false,
+    description: "Use HTTP GET when doing link validation, instead of HEAD.",
+    name: "check-links-using-get",
+    type: Boolean,
+  },
+  {
     alias: "v",
     description: "Don't perform HTML validation.",
     name: "no-validator",
@@ -169,12 +176,13 @@ async function doMarkupValidation(file) {
   console.info("    ✅  Looks good! No HTML validation errors!\n");
 }
 
-async function checkLinks(file) {
+async function checkLinks(file, { useGET }) {
   console.info("🔎 Checking links and cross-references...");
   const dir = path.dirname(file);
+  const additionalArgs = useGET ? "--http-always-get" : "";
   // the link checker expects a directory, not a file.
   await new ShellCommand(
-    `npx link-checker --http-timeout=20000 --http-redirects=3 ${dir}`
+    `npx link-checker --http-timeout=20000 ${additionalArgs} --http-redirects=3 ${dir}`
   ).run();
   console.info("\n    ✅  Links are good!\n");
 }
@@ -202,7 +210,7 @@ async function validate(options) {
       await doMarkupValidation(htmlFile);
     }
     if (!options["no-links"]) {
-      await checkLinks(htmlFile);
+      await checkLinks(htmlFile, { useGET: options["check-links-using-get"] });
     }
     console.info("🎉 All checks passed!");
   } catch (err) {
