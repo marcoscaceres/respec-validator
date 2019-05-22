@@ -150,7 +150,6 @@ async function doReSpecValidation(spec, params) {
   server.listen(5000, () => {});
   const url = new URL(`http://localhost:5000/${spec}`);
   for (const [key, value] of Object.entries(params)) {
-    console.log("Adding", key, value.substring(0, 2));
     url.searchParams.append(key, value);
   }
   // -e is stop on errors, -w is stop on warnings
