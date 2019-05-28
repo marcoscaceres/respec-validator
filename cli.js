@@ -4,6 +4,14 @@
 const path = require("path");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
+const handler = require("serve-handler");
+
+const http = require("http");
+const server = http.createServer((request, response) =>
+  handler(request, response)
+);
+server.listen(5000, () => {});
+
 let DEBUG = process.env.DEBUG || false;
 const optionList = [
   {
@@ -142,12 +150,6 @@ async function doReSpecValidation(spec, params) {
   console.info(`🔎 Validating ReSpec document "${spec}"...\n`);
   const tempDir = await new ShellCommand("mktemp -d", { quiet: true }).run();
   const tempFile = path.resolve(tempDir.trim(), "./output.html");
-  const handler = require("serve-handler");
-  const http = require("http");
-  const server = http.createServer((request, response) =>
-    handler(request, response)
-  );
-  server.listen(5000, () => {});
   const url = new URL(`http://localhost:5000/${spec}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.append(key, value);
