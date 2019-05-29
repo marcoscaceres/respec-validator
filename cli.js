@@ -183,7 +183,7 @@ async function checkLinks(file, { useGET }) {
   const additionalArgs = useGET ? "--http-always-get" : "";
   // the link checker expects a directory, not a file.
   await new ShellCommand(
-    `npx link-checker --http-timeout=20000 ${additionalArgs} --http-redirects=3 ${dir}`
+    `npx link-checker --http-timeout=50000 ${additionalArgs} --http-redirects=3 ${dir}`
   ).run();
   console.info("\n    ✅  Links are good!\n");
 }
