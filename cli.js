@@ -215,7 +215,7 @@ async function validate(options) {
     }
     console.info("🎉 All checks passed!");
   } catch (err) {
-    if (DEBUG) console.error(err);
+    console.error(err);
     console.info("\n ❌  Not so good... please fix the issues above.");
     exitCode = 1;
   } finally {
