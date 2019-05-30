@@ -5,7 +5,7 @@ const path = require("path");
 const commandLineArgs = require("command-line-args");
 const commandLineUsage = require("command-line-usage");
 const handler = require("serve-handler");
-
+const { promises: fs } = require("fs");
 const http = require("http");
 const server = http.createServer((request, response) =>
   handler(request, response)
@@ -73,6 +73,11 @@ const optionList = [
     description: "A ReSpec src file.",
     multiple: false,
     name: "src",
+    type: String,
+  },
+  {
+    name: "manifest",
+    description: "Path to Echidna manifest",
     type: String,
   },
 ];
@@ -177,15 +182,33 @@ async function doMarkupValidation(file) {
   console.info("    ✅  Looks good! No HTML validation errors!\n");
 }
 
-async function checkLinks(file, { useGET }) {
+async function checkLinks(file, { useGET, ignores }) {
   console.info("🔎 Checking links and cross-references...");
   const dir = path.dirname(file);
   const additionalArgs = useGET ? "--http-always-get" : "";
   // the link checker expects a directory, not a file.
   await new ShellCommand(
-    `npx link-checker --http-timeout=50000 ${additionalArgs} --http-redirects=3 ${dir}`
+    `npx link-checker ${dir} --http-timeout=50000 ${additionalArgs} --http-redirects=3 ${ignores}`
   ).run();
   console.info("\n    ✅  Links are good!\n");
+}
+
+/**
+ * Process an echidna manifest, spits out URLs to ignore
+ */
+async function processManifest(manifest) {
+  const manifestPath = path.resolve(manifest);
+  const data = await fs.readFile(manifestPath, "utf-8");
+  const ignores = data
+    .split(/\n/)
+    .filter(item => item)
+    .map(item => {
+      const [urlComponent] = item.split(/\s+/);
+      const { pathname } = new URL(urlComponent, "file://");
+      return `--url-ignore=${pathname.slice(1)}`;
+    })
+    .join(" ");
+  return ignores;
 }
 
 /**
@@ -211,7 +234,10 @@ async function validate(options) {
       await doMarkupValidation(htmlFile);
     }
     if (!options["no-links"]) {
-      await checkLinks(htmlFile, { useGET: options["check-links-using-get"] });
+      await checkLinks(htmlFile, {
+        useGET: options["check-links-using-get"],
+        ignores: options.manifest ? await processManifest(options.manifest) : "",
+      });
     }
     console.info("🎉 All checks passed!");
   } catch (err) {
