@@ -7,10 +7,11 @@ const commandLineUsage = require("command-line-usage");
 const handler = require("serve-handler");
 const { promises: fs } = require("fs");
 const http = require("http");
-const server = http.createServer(async (request, response) =>
-  await handler(request, response, {
-    "cleanUrls": false
-  })
+const server = http.createServer(
+  async (request, response) =>
+    await handler(request, response, {
+      cleanUrls: false,
+    })
 );
 server.listen(5000, () => {});
 
@@ -238,7 +239,9 @@ async function validate(options) {
     if (!options["no-links"]) {
       await checkLinks(htmlFile, {
         useGET: options["check-links-using-get"],
-        ignores: options.manifest ? await processManifest(options.manifest) : "",
+        ignores: options.manifest
+          ? await processManifest(options.manifest)
+          : "",
       });
     }
     console.info("🎉 All checks passed!");
