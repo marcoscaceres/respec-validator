@@ -7,8 +7,10 @@ const commandLineUsage = require("command-line-usage");
 const handler = require("serve-handler");
 const { promises: fs } = require("fs");
 const http = require("http");
-const server = http.createServer((request, response) =>
-  handler(request, response)
+const server = http.createServer(async (request, response) =>
+  await handler(request, response, {
+    "cleanUrls": false
+  })
 );
 server.listen(5000, () => {});
 
