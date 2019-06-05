@@ -191,7 +191,7 @@ async function checkLinks(file, { useGET, ignores }) {
   const additionalArgs = useGET ? "--http-always-get" : "";
   // the link checker expects a directory, not a file.
   await new ShellCommand(
-    `npx link-checker ${dir} --http-timeout=50000 ${additionalArgs} --http-redirects=3 ${ignores}`
+    `npx link-checker ${dir} --url-ignore="https://ev.buaa.edu.cn/" --http-timeout=50000 ${additionalArgs} --http-redirects=3 ${ignores}`
   ).run();
   console.info("\n    ✅  Links are good!\n");
 }
