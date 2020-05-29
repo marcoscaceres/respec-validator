@@ -181,7 +181,8 @@ async function doReSpecValidation(spec, params) {
 async function doMarkupValidation(file) {
   console.info("🔎 Checking document markup...\n");
   const vnu = require("vnu-jar");
-  await new ShellCommand(`java -jar ${vnu} --also-check-css ${file}`).run();
+  const cmd = `java -jar ${vnu} --also-check-css --filterpattern ".*bdi.*" ${file}`;
+  await new ShellCommand(cmd).run();
   console.info("    ✅  Looks good! No HTML validation errors!\n");
 }
 
