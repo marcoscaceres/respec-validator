@@ -1,6 +1,6 @@
 {
   "name": "respec-validator",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Validates ReSpec documents in various ways.",
   "main": "cli.js",
   "scripts": {
