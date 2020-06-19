@@ -21,10 +21,9 @@
   "dependencies": {
     "command-line-args": "^5.1.1",
     "command-line-usage": "^6.1.0",
-    "link-checker": "^1.4.0",
-    "mkdirp": "^1.0.4",
+    "link-checker": "^1.4.1",
     "respec": "latest",
-    "serve": "^11.3.1",
+    "serve": "^11.3.2",
     "vnu-jar": "^20.5.29"
   },
   "devDependencies": {},
