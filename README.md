@@ -43,7 +43,7 @@ $ npx respec-validate --no-links spec.html
 
 ### Can I make it run faster?
 
-If you already have Chromium installed, you can set the following environment variables to avoid downloading Chromium unnecessarily.
+If you already have Chrome installed, you can set the following environment variables to avoid downloading Chromium unnecessarily.
 
 ``` bash
 export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
