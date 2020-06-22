@@ -163,7 +163,7 @@ async function doReSpecValidation(spec, params) {
     url.searchParams.append(key, value);
   }
   // -e is stop on errors, -w is stop on warnings
-  const cmd = `npx respec2html -e -w --timeout 30 --src "${
+  const cmd = `npx -p respec respec2html -e -w --timeout 30 --src "${
     url.href
   }" --out ${tempFile}`;
   await new ShellCommand(cmd).run();
