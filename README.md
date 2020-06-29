@@ -38,3 +38,26 @@ Don't do link check:
 ```Bash
 $ npx respec-validate --no-links spec.html
 ```
+
+## FAQ
+
+### Can I make it run faster?
+
+If you already have Chrome installed, you can set the following environment variables to avoid downloading Chromium unnecessarily.
+
+``` bash
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+# Replace the path with your actual Chromium browser path
+export PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
+# Some common values for above might be:
+# on MacOS: "/Applications/Google Chrome.app/Contents/MacOS/Google chrome"
+# on Ubuntu: /usr/bin/google-chrome
+# on Windows 10: C:\Users\USER\AppData\Local\Google\Chrome\Application\chome.exe
+```
+
+or, in a GitHub Action workflow (as they have Chrome installed; assuming Ubuntu)
+``` yaml
+env:
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 1
+  PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+```
