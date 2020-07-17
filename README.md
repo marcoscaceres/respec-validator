@@ -30,13 +30,13 @@ The following `options` are available:
 Check all warnings/errors, HTML, and cross references.
 
 ```Bash
-$ npx respec-validate index.html
+$ npx respec-validator index.html
 ```
 
 Don't do link check:
 
 ```Bash
-$ npx respec-validate --no-links spec.html
+$ npx respec-validator --no-links spec.html
 ```
 
 ## FAQ
