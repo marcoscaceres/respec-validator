@@ -8,7 +8,7 @@ A tool that helps validates a ReSpec document for publication. It:
 ## Installation
 
 ```Bash
-npm install respec-validator
+npm install -g respec-validator 
 ```
 
 ## Options
