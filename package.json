@@ -1,6 +1,6 @@
 {
   "name": "respec-validator",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Validates ReSpec documents in various ways.",
   "main": "cli.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "link-checker": "^1.4.1",
     "respec": "latest",
     "serve": "^11.3.2",
-    "vnu-jar": "^20.5.29"
+    "vnu-jar": "^20.6.30"
   },
   "devDependencies": {},
   "repository": {
