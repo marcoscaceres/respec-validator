@@ -24,7 +24,7 @@
     "link-checker": "^1.4.1",
     "respec": "latest",
     "serve": "^11.3.2",
-    "vnu-jar": "^20.6.30"
+    "vnu-jar": "^21.0.0"
   },
   "devDependencies": {},
   "repository": {
