@@ -23,7 +23,7 @@
     "command-line-usage": "^6.1.1",
     "link-checker": "^1.4.2",
     "respec": "latest",
-    "serve": "^11.3.2",
+    "serve": "^12.0.0",
     "vnu-jar": "^21.4.9"
   },
   "devDependencies": {},
