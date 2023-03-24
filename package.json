@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "command-line-args": "^5.1.1",
-    "command-line-usage": "^6.1.1",
+    "command-line-usage": "^7.0.0",
     "link-checker": "^1.4.2",
     "respec": "latest",
     "serve": "^13.0.0",
