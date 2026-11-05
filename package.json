@@ -19,7 +19,7 @@
     "respec-validator": "cli.js"
   },
   "dependencies": {
-    "command-line-args": "^5.1.1",
+    "command-line-args": "^6.0.0",
     "command-line-usage": "^6.1.1",
     "link-checker": "^1.4.2",
     "respec": "latest",
